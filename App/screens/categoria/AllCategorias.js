@@ -1,73 +1,130 @@
-import React from 'react';
-import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, Platform } from 'react-native';
+import React, { useEffect, useState } from 'react';
+import { View, Text, Image, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
+import axios from 'axios';
 import Header from '../../components/Voltar';
-
-import cBebidas from '../../assets/img/cardCategorias/cBebidas.jpg';
-import cBolos from '../../assets/img/cardCategorias/cBolos.jpg';
-import cDoces from '../../assets/img/cardCategorias/cDoces.jpg';
-import cLanches from '../../assets/img/cardCategorias/cLanches.jpg';
-import cMassas from '../../assets/img/cardCategorias/cMassas.jpg';
-import cSalgados from '../../assets/img/cardCategorias/cSalgados.jpg';
 import BottomNav from '../../components/BottomNav';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-const categorias = [
-  { name: 'Bebidas', image: cBebidas },
-  { name: 'Bolos', image: cBolos },
-  { name: 'Doces', image: cDoces },
-  { name: 'Lanches', image: cLanches },
-  { name: 'Massas', image: cMassas },
-  { name: 'Salgados', image: cSalgados },
-];
+// 🔹 Gera uma cor fixa e vibrante com base no nome
+function getColorFromName(name) {
+  const colors = ['#E63946', '#F4A261', '#2A9D8F', '#E9C46A', '#457B9D', '#8D99AE', '#FF6B6B'];
+  const index = name.charCodeAt(0) % colors.length;
+  return colors[index];
+}
 
 export default function AllCategorias({ navigation }) {
+  const [categorias, setCategorias] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchCategorias = async () => {
+      try {
+        const res = await axios.get('http://localhost:3001/categorias');
+        setCategorias(res.data);
+      } catch (error) {
+        console.error('Erro ao carregar categorias:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchCategorias();
+  }, []);
+
+  if (loading) {
+    return (
+      <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+        <ActivityIndicator size="large" color="#E63946" />
+        <Text style={{ marginTop: 10, color: '#555', fontWeight: '500' }}>Carregando categorias...</Text>
+      </View>
+    );
+  }
+
   return (
     <View style={styles.container}>
       <Header navigation={navigation} />
       <ScrollView contentContainerStyle={styles.scrollContent} showsVerticalScrollIndicator={false}>
         <Text style={styles.title}>Categorias</Text>
+
         <View style={styles.categories}>
-          {categorias.map((cat, index) => (
-            <TouchableOpacity
-              key={index}
-              style={styles.card}
-              onPress={() => navigation.navigate('Categoria', { nome: cat.name })}
-            >
-              <Image source={cat.image} style={styles.cardImage} resizeMode="cover" />
-              <Text style={styles.cardTitle}>{cat.name}</Text>
-            </TouchableOpacity>
-          ))}
+          {categorias.map((cat, index) => {
+            const nome = cat.nome || cat.name || 'Sem Nome';
+            const imagemRemota = cat.imagem_url ? { uri: cat.imagem_url } : null;
+
+            return (
+              <TouchableOpacity
+                key={index}
+                style={styles.card}
+                onPress={() => navigation.navigate('Categoria', { nome })}
+              >
+                {imagemRemota ? (
+                  <Image source={imagemRemota} style={styles.cardImage} resizeMode="cover" />
+                ) : (
+                  <View style={[styles.cardImage, { backgroundColor: getColorFromName(nome) }]}>
+                    <MaterialCommunityIcons name="silverware-fork-knife" size={34} color="#fff" />
+                    <Text style={styles.fallbackText}>{nome}</Text>
+                  </View>
+                )}
+
+                <Text style={styles.cardTitle}>{nome}</Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
 
-      {/* BottomNav fixo */}
       <BottomNav navigation={navigation} active="allCategorias" />
-
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fdfdfd' },
+  container: { flex: 1, backgroundColor: '#F8FAFC' },
   scrollContent: {
     padding: 20,
-    paddingBottom: 100, // espaço extra para não cortar conteúdo atrás do BottomNav
+    paddingBottom: 100,
     alignItems: 'center',
   },
-  title: { fontSize: 24, marginVertical: 20, fontWeight: 'bold', color: '#333' },
-  categories: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 20 },
+  title: { fontSize: 26, marginVertical: 20, fontWeight: 'bold', color: '#222' },
+  categories: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    gap: 20,
+  },
   card: {
     borderWidth: 1,
-    borderColor: '#ccc',
-    borderRadius: 8,
+    borderColor: '#ddd',
+    borderRadius: 12,
     padding: 10,
     width: 150,
     alignItems: 'center',
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowOffset: { width: 0, height: 2 },
-    shadowRadius: 5,
     backgroundColor: '#fff',
+    shadowColor: '#000',
+    shadowOpacity: 0.15,
+    shadowOffset: { width: 0, height: 3 },
+    shadowRadius: 6,
+    elevation: 3,
   },
-  cardImage: { width: '100%', height: 100, borderRadius: 4 },
-  cardTitle: { marginTop: 10, fontWeight: 'bold', fontSize: 16, color: '#333' },
+  cardImage: {
+    width: '100%',
+    height: 100,
+    borderRadius: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  fallbackText: {
+    color: '#fff',
+    fontWeight: 'bold',
+    fontSize: 15,
+    marginTop: 5,
+    textAlign: 'center',
+  },
+  cardTitle: {
+    marginTop: 10,
+    fontWeight: 'bold',
+    fontSize: 16,
+    color: '#222',
+    textAlign: 'center',
+  },
 });

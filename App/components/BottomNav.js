@@ -5,7 +5,7 @@ export default function BottomNav({ navigation, active, isLoggedIn }) {
   const items = [
     { name: 'Início', icon: 'https://cdn-icons-png.flaticon.com/512/25/25694.png', route: 'Home' },
     { name: 'Categorias', icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828859.png', route: 'allCategorias' },
-    { name: 'Nova Receita', icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png', route: 'NovaReceita', plus: true },
+    { name: '', icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png', route: 'NovaReceita', plus: true },
     { name: 'Favoritos', icon: 'https://cdn-icons-png.flaticon.com/512/833/833472.png', route: 'Favoritos' },
     { name: 'Perfil', icon: 'https://cdn-icons-png.flaticon.com/512/1077/1077063.png', route: isLoggedIn ? 'CadastroLogin' : 'Perfil' },
   ];
