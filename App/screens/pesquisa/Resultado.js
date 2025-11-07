@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, FlatList, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
+import Header from '../../components/Voltar';
 
 export default function Resultados({ route, navigation }) {
   const { termo } = route.params || { termo: '' };
@@ -30,7 +31,7 @@ export default function Resultados({ route, navigation }) {
       <Text style={styles.receitaDescricao}>{item.descricao}</Text>
       <TouchableOpacity
         style={styles.verReceitaBtn}
-        onPress={() => navigation.navigate('ReceitaDetalhe', { id: item.id_receitas })}
+        onPress={() => navigation.navigate('ReceitaDet', { id: item.id_receitas })}
       >
         <Text style={styles.verReceitaText}>Ver receita</Text>
       </TouchableOpacity>
@@ -47,6 +48,7 @@ export default function Resultados({ route, navigation }) {
 
   return (
     <View style={styles.container}>
+      <Header navigation={navigation}/>
       <Text style={styles.title}>Resultados da pesquisa: "{termo}"</Text>
 
       {receitas.length > 0 ? (

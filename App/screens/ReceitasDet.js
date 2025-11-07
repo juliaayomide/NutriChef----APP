@@ -48,6 +48,8 @@ export default function ReceitaDet({ route, navigation }) {
     );
   }
 
+  const tabela = receita.tabelaNutricional;
+  
   return (
     <ScrollView style={styles.container}>
       <Logo/>
@@ -78,6 +80,37 @@ export default function ReceitaDet({ route, navigation }) {
         <Text key={index} style={styles.step}>{index + 1}. {passo}</Text>
       ))}
 
+        {/* 🍎 TABELA NUTRICIONAL */}
+        {tabela ? (
+          <View style={styles.nutriContainer}>
+            <Text style={styles.nutriTitle}>Tabela Nutricional (por porção)</Text>
+            <View style={styles.nutriTable}>
+              <View style={styles.nutriRow}>
+                <Text style={styles.nutriLabel}>Porções:</Text>
+                <Text style={styles.nutriValue}>{tabela.porcoes}</Text>
+              </View>
+              <View style={styles.nutriRow}>
+                <Text style={styles.nutriLabel}>Calorias:</Text>
+                <Text style={styles.nutriValue}>{tabela.calorias} kcal</Text>
+              </View>
+              <View style={styles.nutriRow}>
+                <Text style={styles.nutriLabel}>Proteínas:</Text>
+                <Text style={styles.nutriValue}>{tabela.proteinas} g</Text>
+              </View>
+              <View style={styles.nutriRow}>
+                <Text style={styles.nutriLabel}>Gorduras:</Text>
+                <Text style={styles.nutriValue}>{tabela.gorduras} g</Text>
+              </View>
+              <View style={styles.nutriRow}>
+                <Text style={styles.nutriLabel}>Carboidratos:</Text>
+                <Text style={styles.nutriValue}>{tabela.carboidratos} g</Text>
+              </View>
+            </View>
+          </View>
+        ) : (
+          <Text style={styles.noData}>Informações nutricionais não disponíveis.</Text>
+        )}
+
     </ScrollView>
   );
 }
@@ -104,16 +137,15 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#FF7F50',
   },
-recipeImage: {
-  width: '60%',
-  height: undefined,      // permite ajustar altura proporcional
-  aspectRatio: 1.5,       // controla a proporção da imagem (1.5 = mais larga, 1 = quadrada, 0.75 = mais alta)
-  borderRadius: 8,
-  marginBottom: 15,
-  resizeMode: 'cover',    // corta suavemente mantendo proporção
-  alignSelf: 'center',    // centraliza a própria imagem
-},
-
+  recipeImage: {
+    width: '60%',
+    height: undefined,      // permite ajustar altura proporcional
+    aspectRatio: 1.5,       // controla a proporção da imagem (1.5 = mais larga, 1 = quadrada, 0.75 = mais alta)
+    borderRadius: 8,
+    marginBottom: 15,
+    resizeMode: 'cover',    // corta suavemente mantendo proporção
+    alignSelf: 'center',    // centraliza a própria imagem
+  },
   title: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -151,5 +183,49 @@ recipeImage: {
     color: '#555',
     marginBottom: 5,
     marginLeft: 10,
+  },
+  // 🍎 Estilos da tabela nutricional
+  nutriContainer: {
+    marginTop: 25,
+    backgroundColor: '#FFF7EC',
+    borderRadius: 10,
+    padding: 15,
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+  },
+  nutriTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#FF7F50',
+    marginBottom: 10,
+    textAlign: 'center',
+  },
+  nutriTable: {
+    borderTopWidth: 1,
+    borderColor: '#FF7F50',
+  },
+  nutriRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingVertical: 5,
+    borderBottomWidth: 0.5,
+    borderColor: '#FFD3B6',
+  },
+  nutriLabel: {
+    fontSize: 14,
+    color: '#444',
+    fontWeight: '600',
+  },
+  nutriValue: {
+    fontSize: 14,
+    color: '#333',
+  },
+  noData: {
+    marginTop: 10,
+    fontSize: 14,
+    color: '#777',
+    fontStyle: 'italic',
+    textAlign: 'center',
   },
 });

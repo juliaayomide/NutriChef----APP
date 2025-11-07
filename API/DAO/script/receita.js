@@ -1,3 +1,4 @@
+import Fuse from "fuse.js";
 import { conexao } from "../conexao.js";
 
 // ===============================
@@ -21,34 +22,41 @@ export async function buscarTodasReceitas() {
 // ===============================
 // 🔎 BUSCAR RECEITAS PELOS TERMOS (vários ingredientes)
 // ===============================
-export async function buscarReceitas(termo) {
+export async function buscarReceitas(termo = "") {
   const conn = await conexao();
+
   try {
-    const termos = termo
-      .split(/[, ]+/)
-      .map(t => t.trim())
-      .filter(t => t.length > 0);
+    // Busca todas as receitas (nome e descrição)
+    const [rows] = await conn.execute(`
+      SELECT id_receitas, nome, descricao 
+      FROM receitas
+    `);
 
-    if (termos.length === 0) {
-      await conn.end();
-      return [];
-    }
-
-    const condicoes = termos
-      .map(() => "(nome LIKE ? OR descricao LIKE ?)")
-      .join(" OR ");
-    const params = termos.flatMap(t => [`%${t}%`, `%${t}%`]);
-
-    const sql = `SELECT id_receitas, nome, descricao FROM receitas WHERE ${condicoes}`;
-    const [rows] = await conn.execute(sql, params);
     await conn.end();
-    return rows;
+
+    // Se não tem termo, retorna tudo
+    if (!termo.trim()) return rows;
+
+    // Configuração do Fuse
+    const options = {
+      keys: ["nome", "descricao"],
+      threshold: 0.4, // quanto menor, mais precisa (0 = exato, 1 = muito tolerante)
+      includeScore: true,
+    };
+
+    const fuse = new Fuse(rows, options);
+    const resultados = fuse.search(termo);
+
+    // Retorna só os itens encontrados
+    return resultados.map((r) => r.item);
+
   } catch (err) {
     console.error("Erro ao buscar receitas:", err);
     await conn.end();
     return [];
   }
 }
+
 
 // ===============================
 // 📂 BUSCAR RECEITAS POR CATEGORIA
@@ -73,7 +81,7 @@ export async function buscarReceitasPorCategoria(nomeCategoria) {
 }
 
 // ===============================
-// 📌 BUSCAR RECEITA COMPLETA PELO ID
+// 📌 BUSCAR RECEITA COMPLETA PELO ID + TABELA NUTRICIONAL
 // ===============================
 export async function buscarReceitaPorId(id) {
   const conn = await conexao();
@@ -84,6 +92,7 @@ export async function buscarReceitaPorId(id) {
     );
     if (receitas.length === 0) return null;
 
+    // ===== INGREDIENTES =====
     const [ingredientesRaw] = await conn.execute(
       `SELECT i.nome, ri.quantidade, ri.unidade 
        FROM receita_ingredientes ri 
@@ -94,6 +103,7 @@ export async function buscarReceitaPorId(id) {
 
     const ingredientes = Array.isArray(ingredientesRaw) ? ingredientesRaw : [];
 
+    // ===== UTENSÍLIOS =====
     const [utensiliosRaw] = await conn.execute(
       `SELECT u.nome 
        FROM receita_utensilios ru 
@@ -104,6 +114,7 @@ export async function buscarReceitaPorId(id) {
 
     const utensilios = Array.isArray(utensiliosRaw) ? utensiliosRaw : [];
 
+    // ===== PASSOS =====
     const [passosRaw] = await conn.execute(
       "SELECT descricao FROM receita_passos WHERE id_receitas = ? ORDER BY ordem",
       [id]
@@ -115,15 +126,82 @@ export async function buscarReceitaPorId(id) {
 
     const autor = receitas[0].autor || "NutriChef";
 
+    // ============================
+    // 🔹 Referência nutricional média (Guia Alimentar)
+    // valores aproximados por 100g
+    // ============================
+    const tabelaBase = {
+      arroz: { kcal: 130, proteina: 2.7, gordura: 0.3, carboidrato: 28 },
+      feijao: { kcal: 140, proteina: 9.0, gordura: 0.5, carboidrato: 25 },
+      frango: { kcal: 165, proteina: 31, gordura: 3.6, carboidrato: 0 },
+      ovo: { kcal: 155, proteina: 13, gordura: 11, carboidrato: 1.1 },
+      leite: { kcal: 42, proteina: 3.4, gordura: 1, carboidrato: 5 },
+      cenoura: { kcal: 41, proteina: 0.9, gordura: 0.2, carboidrato: 10 },
+      farinha: { kcal: 364, proteina: 10, gordura: 1, carboidrato: 76 },
+      acucar: { kcal: 387, proteina: 0, gordura: 0, carboidrato: 100 },
+      oleo: { kcal: 884, proteina: 0, gordura: 100, carboidrato: 0 },
+      manteiga: { kcal: 717, proteina: 0.9, gordura: 81, carboidrato: 0.1 },
+      batata: { kcal: 77, proteina: 2, gordura: 0.1, carboidrato: 17 },
+      carne: { kcal: 250, proteina: 26, gordura: 15, carboidrato: 0 },
+      tomate: { kcal: 18, proteina: 0.9, gordura: 0.2, carboidrato: 3.9 },
+      massa: { kcal: 131, proteina: 5, gordura: 1.1, carboidrato: 25 },
+    };
+
+    // ============================
+    // 🔹 Cálculo nutricional aproximado
+    // ============================
+    let total = { kcal: 0, proteina: 0, gordura: 0, carboidrato: 0 };
+
+    ingredientes.forEach(i => {
+      const nome = i.nome.toLowerCase();
+      const ref = Object.keys(tabelaBase).find(k => nome.includes(k));
+      const qtd = i.quantidade && !isNaN(i.quantidade) ? parseFloat(i.quantidade) : 100; // default 100g
+
+      if (ref) {
+        const fator = qtd / 100; // converte para porção proporcional
+        total.kcal += tabelaBase[ref].kcal * fator;
+        total.proteina += tabelaBase[ref].proteina * fator;
+        total.gordura += tabelaBase[ref].gordura * fator;
+        total.carboidrato += tabelaBase[ref].carboidrato * fator;
+      }
+    });
+
+    // Normaliza por porção (ex: receita serve 4)
+    const porcoes = receitas[0].porcoes || 4;
+    const tabelaNutricional = {
+      porcoes,
+      calorias: (total.kcal / porcoes).toFixed(0),
+      proteinas: (total.proteina / porcoes).toFixed(1),
+      gorduras: (total.gordura / porcoes).toFixed(1),
+      carboidratos: (total.carboidrato / porcoes).toFixed(1),
+    };
+
+    // ===== AJUSTE FINAL =====
     return {
       ...receitas[0],
       autor,
       ingredientes: ingredientes.map(i => {
-        const qtd = i.quantidade % 1 === 0 ? i.quantidade : i.quantidade.toFixed(2);
-        return `${qtd} ${i.unidade || ""} ${i.nome}`;
+        const qtdValida = i.quantidade !== null && i.quantidade !== 0 && !isNaN(i.quantidade);
+        const unidadeValida = i.unidade && i.unidade.trim() !== "";
+        let texto = "";
+
+        if (qtdValida) {
+          const qtd = Number.isInteger(i.quantidade)
+            ? i.quantidade
+            : parseFloat(i.quantidade).toFixed(2);
+          texto += `${qtd}`;
+        }
+
+        if (unidadeValida) {
+          texto += (texto ? " " : "") + i.unidade.trim();
+        }
+
+        texto += (texto ? " " : "") + i.nome.trim();
+        return texto.trim();
       }),
       utensilios: utensilios.map(u => u.nome),
-      passos: passos.map(p => p.descricao)
+      passos: passos.map(p => p.descricao),
+      tabelaNutricional
     };
   } catch (err) {
     console.error("Erro ao buscar receita por ID:", err);
