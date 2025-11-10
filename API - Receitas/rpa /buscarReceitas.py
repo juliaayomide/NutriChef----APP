@@ -271,7 +271,7 @@ def salvar_receitas_no_banco(conn, receitas, termo):
 # ==============================
 # 🤖 COLETA VIA SELENIUM
 # ==============================
-def coletar_panelinha_selenium(termo, max_receitas=5):
+def coletar_panelinha_selenium(termo, max_receitas=15):
     options = Options()
     options.add_argument("--headless")
     options.add_argument("--window-size=1920,1080")
