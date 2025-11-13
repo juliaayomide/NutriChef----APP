@@ -20,7 +20,7 @@
       <a class="nav-item" href="#" data-screen="denuncias">Avaliações</a>
       <a class="nav-item" href="#"data-screen="receitasRecebidas">Solicitação de Receitas</a>
     </nav>
-    <div id="admin-info" style="margin-top:auto;color:var(--muted);font-size:13px"></div>
+  
   </aside>
 
   <main class="main">
@@ -32,6 +32,7 @@
         </div>
       </div>
       <div class="icons">
+        <div id="admin-info" style="margin-top:auto;color:var(--muted);font-size:13px"></div>
         <div class="avatar"></div>
       </div>
     </div>
@@ -163,15 +164,20 @@
 async function mostrarUsuarioLogado() {
   try {
     const res = await fetch('http://localhost:3000/api/usuario-logado', {
-      credentials: 'include' // se usar cookies de sessão
+      credentials: 'include' // essencial para enviar cookie da sessão
     });
+
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const usuario = await res.json();
 
-    if(usuario && usuario.nome){
+    if (usuario?.nome) {
       document.getElementById('admin-info').textContent = `${usuario.nome} • ${usuario.tipo}`;
+    } else {
+      document.getElementById('admin-info').textContent = 'Não logado';
     }
-  } catch(err){
+  } catch (err) {
     console.error('Erro ao buscar usuário logado:', err);
+    document.getElementById('admin-info').textContent = 'Erro ao carregar usuário';
   }
 }
 
