@@ -33,7 +33,7 @@
       </div>
       <div class="icons">
         <div id="admin-info" style="margin-top:auto;color:var(--muted);font-size:13px"></div>
-        <div class="avatar"></div>
+        <!-- <div class="avatar"></div> -->
       </div>
     </div>
 
@@ -103,28 +103,27 @@
       </section>
 
       <!-- RECEITAS -->
-        <section class="card" id="screen-receitas" style="display:none">
-          <h3>Receitas Cadastradas</h3>
+      <section class="card" id="screen-receitas" style="display:none">
+        <h3>Receitas Cadastradas</h3>
 
-          <div class="receitas-top">
-            <input type="text" id="search-receita" style="border: solid 3px #000;" placeholder="Pesquisar receita..." />
-          </div>
+        <div class="receitas-top">
+          <input type="text" id="search-receita" style="border: solid 3px #000;" placeholder="Pesquisar receita..." />
+        </div>
 
-          <div id="receitas-container" class="receitas-container"></div>
-        </section>
+        <ul id="receitas-lista" class="receitas-lista"></ul>
+      </section>
 
-        <!-- Modal de confirmação -->
-        <div id="delete-modal" class="modal" style="display:none;">
-          <div class="modal-content">
-            <h3>Excluir Receita</h3>
-            <p>Tem certeza que deseja excluir esta receita?</p>
-            <div class="modal-buttons">
-              <button id="confirm-delete">Sim, excluir</button>
-              <button id="cancel-delete">Cancelar</button>
-            </div>
+      <!-- Modal de confirmação -->
+      <div id="delete-modal" class="modal" style="display:none;">
+        <div class="modal-content">
+          <h3>Excluir Receita</h3>
+          <p>Tem certeza que deseja excluir esta receita?</p>
+          <div class="modal-buttons">
+            <button id="confirm-delete">Sim, excluir</button>
+            <button id="cancel-delete">Cancelar</button>
           </div>
         </div>
-      </section>
+      </div>
 
 
       <!-- AVALIAÇÕES -->
@@ -151,8 +150,7 @@
 
       <!-- Modal de Receitas -->
       <div id="modal-receita" class="modal" style="display:none;">
-        <div class="modal-content">
-          <span id="fechar-modal" style="cursor:pointer;float:right;font-size:18px">&times;</span>
+        <div class="modal-content"> 
           <div id="conteudo-receita"></div>
         </div>
       </div>
@@ -160,358 +158,8 @@
   </main>
 </div>
 
-<script>
-async function mostrarUsuarioLogado() {
-  try {
-    const res = await fetch('http://localhost:3000/api/usuario-logado', {
-      credentials: 'include' // essencial para enviar cookie da sessão
-    });
 
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const usuario = await res.json();
-
-    if (usuario?.nome) {
-      document.getElementById('admin-info').textContent = `${usuario.nome} • ${usuario.tipo}`;
-    } else {
-      document.getElementById('admin-info').textContent = 'Não logado';
-    }
-  } catch (err) {
-    console.error('Erro ao buscar usuário logado:', err);
-    document.getElementById('admin-info').textContent = 'Erro ao carregar usuário';
-  }
-}
-
-mostrarUsuarioLogado();
-
-
-
-(async () => {
-  const screens = ['dashboard','receitas','denuncias','receitasRecebidas'];
-  const pageTitle = document.getElementById('page-title');
-
-  let receitasRecebidas = []; // armazenar todas as receitas
-  let paginaAtual = 0;
-  const receitasPorPagina = 5;
-
-  // Troca de telas
-  document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('click', e => {
-      e.preventDefault();
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-
-      const screen = item.getAttribute('data-screen');
-      pageTitle.textContent = 
-        screen==='dashboard'?'Visão Geral':
-        screen==='receitas'?'Receitas Cadastradas':
-        screen==='receitasRecebidas'?'Solicitações de Receitas':'Avaliações';
-
-      screens.forEach(s => {
-        const sec = document.getElementById('screen-'+s);
-        if(sec) sec.style.display = (s===screen)?'block':'none';
-      });
-
-      // Carrega receitas recebidas ao abrir a aba
-      if(screen==='receitasRecebidas') carregarReceitasRecebidas();
-    });
-  });
-
-  const containerReceitas = document.getElementById('receitas-recebidas-container');
-  const searchInput = document.getElementById('search-receita-recebida');
-  const modal = document.getElementById('modal-receita');
-  const conteudoModal = document.getElementById('conteudo-receita');
-  const btnFecharModal = document.getElementById('fechar-modal');
-
-  btnFecharModal.addEventListener('click', ()=> modal.style.display='none');
-
-  function criarCardResumo(receita) {
-    const card = document.createElement('div');
-    card.className = 'receita-card-resumo';
-    card.style.display = 'flex';
-    card.style.alignItems = 'center';
-    card.style.gap = '10px';
-    card.style.marginBottom = '10px';
-
-    card.innerHTML = `
-      <img src="${receita.imagem}" style="width:80px;height:60px;object-fit:cover;border-radius:5px">
-      <div style="flex:1">
-        <strong>${receita.nome}</strong><br>
-        <span style="font-size:12px;color:var(--muted)">${receita.categoria}</span>
-      </div>
-      <button class="btn-vermais">Ver Mais</button>
-    `;
-
-    card.querySelector('.btn-vermais').addEventListener('click', ()=> abrirModal(receita));
-    return card;
-  }
-
-  function abrirModal(receita) {
-    conteudoModal.innerHTML = `
-      <h3 contenteditable="true" id="edit-nome">${receita.nome}</h3>
-      <img src="${receita.imagem}" style="max-width:100%;border-radius:8px;margin-bottom:10px">
-      <p><strong>Categoria:</strong> <span contenteditable="true" id="edit-categoria">${receita.categoria}</span></p>
-      <p><strong>Origem:</strong> <span contenteditable="true" id="edit-origem">${receita.origem}</span></p>
-      <p><strong>Ingredientes:</strong></p>
-      <ul id="edit-ingredientes">
-        ${receita.ingredientes.map(i => `<li contenteditable="true">${i}</li>`).join('')}
-      </ul>
-      <p><strong>Instruções:</strong></p>
-      <p id="edit-instrucoes" contenteditable="true">${receita.instrucoes}</p>
-      <div class="modal-buttons">
-        <button id="salvar-edicao" style="background:#2ecc71">💾 Salvar Alterações</button>
-        <button id="aceitar-receita">Aceitar</button>
-        <button id="rejeitar-receita">Rejeitar</button>
-      </div>
-    `;
-    modal.style.display = 'flex';
-
-    // === AÇÕES ===
-    document.getElementById('salvar-edicao').onclick = () => {
-      const novosDados = {
-        nome: document.getElementById('edit-nome').innerText.trim(),
-        categoria: document.getElementById('edit-categoria').innerText.trim(),
-        origem: document.getElementById('edit-origem').innerText.trim(),
-        ingredientes: Array.from(document.querySelectorAll('#edit-ingredientes li')).map(li => li.innerText.trim()),
-        instrucoes: document.getElementById('edit-instrucoes').innerText.trim()
-      };
-
-      // Atualiza localmente
-      Object.assign(receita, novosDados);
-      alert('Alterações salvas localmente!');
-
-      // Salva no banco via API
-      fetch('http://localhost:3000/api/atualizar-receita', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          id: receita.id, // precisa vir no objeto original
-          nome: novosDados.nome,
-          categoria: novosDados.categoria,
-          origem: novosDados.origem,
-          ingredientes: novosDados.ingredientes,
-          instrucoes: novosDados.instrucoes
-        })
-      })
-        .then(res => res.json())
-        .then(data => {
-          if (data.success) {
-            alert('Receita atualizada no banco com sucesso!');
-          } else {
-            alert('Erro: ' + data.message);
-          }
-        })
-        .catch(err => {
-          console.error(err);
-          alert('Erro ao salvar no banco.');
-        });
-    };
-
-    document.getElementById('aceitar-receita').onclick = async () => {
-      try {
-        const receitaSelecionada = receita; // receita do modal
-
-        const response = await fetch('http://localhost:3001/publicar', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            nome: receitaSelecionada.nome || 'Receita sem nome',
-            descricao: receitaSelecionada.instrucoes || 'Sem instruções',
-            porcoes: 1,
-            custo: 1,
-            dificuldade: 1,
-            idCategoria: 1,
-            idIngredienteBase: 1,
-            tempoPreparo: receitaSelecionada.tempo || 0,
-            ingredientes: JSON.stringify(receitaSelecionada.ingredientes || []),
-            utensilios: JSON.stringify([]),
-            passos: JSON.stringify([]),
-            info: ''
-          })
-        });
-
-        const data = await response.json();
-
-        if (data.success) {
-          alert(`Receita "${receitaSelecionada.nome}" validada e salva no banco!`);
-          modal.style.display = 'none';
-          removerReceita(receitaSelecionada.nome);
-        } else {
-          alert('Erro ao salvar receita: ' + data.message);
-        }
-      } catch (err) {
-        console.error(err);
-        alert('Erro ao salvar receita no servidor.');
-      }
-    };
-
-
-    document.getElementById('rejeitar-receita').onclick = () => {
-      alert(`Receita "${receita.nome}" rejeitada!`);
-      modal.style.display = 'none';
-      removerReceita(receita.nome);
-    };
-  }
-
-  function removerReceita(nome) {
-    receitasRecebidas = receitasRecebidas.filter(r=>r.nome !== nome);
-    paginaAtual = 0; // reset página
-    mostrarReceitasPagina();
-  }
-
-  function mostrarReceitasPagina() {
-    containerReceitas.innerHTML='';
-    const inicio = paginaAtual * receitasPorPagina;
-    const fim = inicio + receitasPorPagina;
-    const pageReceitas = receitasRecebidas.slice(inicio,fim);
-
-    pageReceitas.forEach(r=>{
-      const card = criarCardResumo(r);
-      containerReceitas.appendChild(card);
-    });
-
-    // Se houver mais receitas, botão carregar mais
-    if(fim < receitasRecebidas.length){
-      const btnMais = document.createElement('button');
-      btnMais.textContent = 'Carregar Mais';
-      btnMais.style.marginTop='10px';
-      btnMais.onclick = ()=>{
-        paginaAtual++;
-        mostrarReceitasPagina();
-      };
-      containerReceitas.appendChild(btnMais);
-    }
-  }
-
-  async function carregarReceitasRecebidas() {
-    containerReceitas.innerHTML = 'Carregando receitas...';
-    receitasRecebidas = [];
-    paginaAtual = 0;
-
-    const requests = [];
-    for (let i = 0; i < 10; i++) {
-        requests.push(fetch('http://localhost:3000/api/importar-receita').then(r => r.json()));
-    }
-
-    receitasRecebidas = await Promise.all(requests); // espera todas traduzidas
-    mostrarReceitasPagina();
-  }
-
-
-  searchInput.addEventListener('input', ()=>{
-    const termo = searchInput.value.toLowerCase();
-    receitasRecebidas = receitasRecebidas.filter(r=>r.nome.toLowerCase().includes(termo));
-    paginaAtual = 0;
-    mostrarReceitasPagina();
-  });
-
-})();
-
-// Funções para popular dados
-  async function fetchStats() {
-    const res = await fetch('http://localhost:3000/api/stats');
-    const data = await res.json();
-    document.getElementById('total-receitas').textContent = data.receitas;
-    document.getElementById('total-comentarios').textContent = data.comentarios;
-    document.getElementById('total-usuarios').textContent = data.usuarios;
-  }
-
-  async function fetchSites() {
-    const res = await fetch('http://localhost:3000/api/sites');
-    const data = await res.json();
-    const container = document.getElementById('sites-list');
-    container.innerHTML = '';
-    data.forEach(site => {
-      container.innerHTML += `
-        <div class="list-row">
-          <div class="list-left"><div class="avatar-sm">${site.nome[0]}</div><div><div style="font-weight:700">${site.nome}</div><div style="color:var(--muted);font-size:13px">${site.produtos} produtos</div></div></div>
-          <div>⋮</div>
-        </div>
-      `;
-    });
-  }
-
-  async function fetchIngredientes() {
-    const res = await fetch('http://localhost:3000/api/ingredientes');
-    const data = await res.json();
-    const container = document.getElementById('ingredientes-list');
-    container.innerHTML = '';
-    data.forEach(ing => {
-      container.innerHTML += `
-        <div style="display:flex;justify-content:space-between">
-          <div style="display:flex;gap:8px;align-items:center">
-            <span style="width:10px;height:10px;border-radius:50%;background:${ing.cor};display:inline-block"></span>
-            <span>${ing.nome}</span>
-          </div>
-          <div style="color:var(--muted)">${ing.percentual}%</div>
-        </div>
-      `;
-    });
-  }
-
-  async function fetchDenuncias(q = '') {
-    const res = await fetch(`http://localhost:3000/api/denuncias?q=${encodeURIComponent(q)}`);
-    const data = await res.json();
-
-    const container = document.getElementById('denuncias-container');
-    container.innerHTML = '';
-
-    if (data.length === 0) {
-      container.innerHTML = '<p style="color:var(--muted)">Nenhuma avaliação encontrada.</p>';
-      return;
-    }
-
-    data.forEach(d => {
-      const checked = d.status === 'Atendida' ? 'checked' : '';
-      container.innerHTML += `
-        <div class="denuncia-card">
-          <div class="denuncia-info">
-            <h4>${d.usuario}</h4>
-            <p><strong>Receita:</strong> ${d.receita}</p>
-            <p><strong>Comentário:</strong> ${d.motivo}</p>
-            <p><strong>Nota:</strong> ${d.nota}</p>
-            <p><strong>Email:</strong> ${d.email}</p>
-            <p><strong>Data:</strong> ${d.data}</p>
-          </div>
-          <div class="denuncia-status">
-            <label>
-              <input type="checkbox" class="status-checkbox" data-id="${d.id}" ${checked}>
-              <span>${d.status}</span>
-            </label>
-          </div>
-        </div>
-      `;
-    });
-
-    document.querySelectorAll('.status-checkbox').forEach(chk => {
-      chk.addEventListener('change', async (e) => {
-        const id = e.target.dataset.id;
-        const novoStatus = e.target.checked ? 'Atendida' : 'Pendente';
-        await fetch(`http://localhost:3000/api/denuncias/${id}/status`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ status: novoStatus })
-        });
-        fetchDenuncias(document.getElementById('search-denuncia').value);
-      });
-    });
-  }
-
-  // 🔍 filtro de busca
-  document.getElementById('search-denuncia').addEventListener('input', e => {
-    fetchDenuncias(e.target.value);
-  });
-
-  // chama na inicialização
-  fetchDenuncias();
-
-  // Chama tudo
-  fetchStats();
-  fetchSites();
-  fetchIngredientes();
-</script>
-
-
-<script src="./js/dashUsuario.js"></script>
-<script src="./js/dashReceitas.js"></script>
+  <script src="./js/dashUsuario.js"></script>
+  <script src="./js/dashReceitas.js"></script>
 </body>
 </html>

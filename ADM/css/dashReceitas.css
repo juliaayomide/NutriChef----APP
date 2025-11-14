@@ -32,12 +32,6 @@
   transform: scale(1.02);
 }
 
-.receita-card img {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-}
-
 .receita-info {
   padding: 12px 14px;
 }
@@ -126,3 +120,122 @@
     background-color: darkred;  /* efeito ao passar o mouse */
 }
 
+.receitas-lista {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+  }
+
+  .receita-item {
+  border: 2px solid #000;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 20px; /* espaço entre info e botões */
+}
+
+/* imagem + textos agrupados */
+.receita-info-group {
+  display: flex;
+  align-items: center;
+  gap: 12px; /* aproxima texto da imagem */
+}
+
+/* imagem maior */
+.receita-img {
+  width: 90px;
+  height: 90px;
+  border-radius: 6px;
+  object-fit: cover;
+}
+
+/* empurra os botões para a direita */
+.receita-actions {
+  margin-left: auto;
+  display: flex;
+  gap: 8px;
+}
+  .receita-actions button {
+    margin-left: 8px;
+    cursor: pointer;
+  }
+
+
+  /* FUNDO ESCURO */
+#modal-receita {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0,0,0,0.6);
+  display: none; /* abre via JS */
+  justify-content: center;
+  align-items: center;
+  z-index: 9999;
+}
+
+/* CAIXA DO MODAL */
+.modal-box {
+  background: #fff;
+  width: 70%;
+  max-width: 900px;
+  max-height: 90vh;
+  padding: 30px;
+  border-radius: 14px;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+  animation: fadeIn .25s ease;
+}
+
+/* BOTÃO X */
+#fechar-modal-top {
+  position: absolute;
+  top: 15px;
+  right: 20px;
+  font-size: 32px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #333;
+  font-weight: bold;
+}
+#fechar-modal-top:hover {
+  color: #000;
+}
+
+/* IMAGEM DO MODAL */
+.modal-img {
+  width: 100%;
+  max-height: 320px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+/* TITULOS */
+.modal-box h2 {
+  font-size: 28px;
+  margin-bottom: 5px;
+}
+.modal-box h3 {
+  font-size: 20px;
+  margin-top: 25px;
+  margin-bottom: 6px;
+  font-weight: 600;
+}
+
+/* TEXTO */
+.modal-box p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* ANIMAÇÃO */
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(.93); }
+  to   { opacity: 1; transform: scale(1); }
+}
