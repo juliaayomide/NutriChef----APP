@@ -241,6 +241,68 @@ app.delete('/api/receitas/:id', async (req, res) => {
   }
 });
 
+app.post("/api/atualizar-receita", async (req, res) => {
+    try {
+        const {
+            id_receitas,
+            nome,
+            descricao,
+            porcoes,
+            custo_aproximado,
+            idDificuldade,
+            id_categoria,
+            id_ingrediente_base,
+            tempo_preparo,
+            imagem
+        } = req.body;
+
+        console.log("BODY RECEBIDO:", req.body);
+
+        if (!id_receitas) {
+            return res.status(400).json({ error: "ID da receita é obrigatório." });
+        }
+
+        // Converter undefined para null
+        const safeValues = [
+            nome ?? null,
+            descricao ?? null,
+            porcoes ?? null,
+            custo_aproximado ?? null,
+            idDificuldade ?? null,
+            id_categoria ?? null,
+            id_ingrediente_base ?? null,
+            tempo_preparo ?? null,
+            imagem ?? null,
+            id_receitas
+        ];
+
+        const sql = `
+            UPDATE receitas
+            SET
+                nome = ?,
+                descricao = ?,
+                porcoes = ?,
+                custo_aproximado = ?,
+                idDificuldade = ?,
+                id_categoria = ?,
+                id_ingrediente_base = ?,
+                tempo_preparo = ?,
+                imagem = ?
+            WHERE id_receitas = ?
+        `;
+
+        await db.execute(sql, safeValues);
+
+        res.json({ success: true, message: "Receita atualizada com sucesso!" });
+
+    } catch (error) {
+        console.error("Erro ao atualizar receita:", error);
+        res.status(500).json({ error: "Erro interno ao atualizar receita." });
+    }
+});
+
+
+
 // ==============================
 // 🧾 ROTAS DE DENÚNCIAS
 // ==============================

@@ -13,7 +13,7 @@
 <body>
 <div class="app">
   <aside class="sidebar card">
-    <div class="logo"><span style="color:var(--accent)">Nutri</span><span class="chef">chef</span></div>
+    
     <nav>
       <a class="nav-item active" href="#" data-screen="dashboard">Dashboard</a>
       <a class="nav-item" href="#" data-screen="receitas">Receitas</a>
@@ -27,6 +27,7 @@
     <div class="card topbar">
       <div class="top-left">
         <div class="title" id="page-title">Visão Geral</div>
+        <div class="logo"><img src="logo.png" alt="logo"></div>
         <div class="search" style="display: none;">
           <input placeholder="Pesquisar..." id="global-search">
         </div>
@@ -54,6 +55,7 @@
               </div>
               <div class="stat">
                 <div class="label">Comentários</div>
+                <br>
                 <div class="num" id="total-comentarios">0</div>
               </div>
               <div class="stat">
@@ -63,22 +65,22 @@
             </div>
           </div>
 
-          <aside>
-            <h4 style="margin:0 0 12px 0">Ingredientes mais procurados</h4>
+      <aside>
+            <h4 style="margin:1px 1px 12px">Ingredientes mais procurados</h4>
                <div class="card" style="padding:10px">
                 <div class="donut">
                   <!-- simple svg donut mock -->
                   <svg viewBox="0 0 42 42" width="220" height="140">
-                    <circle cx="21" cy="21" r="15.5" fill="none" stroke="#fff" stroke-width="8"/>
-                    <circle cx="21" cy="21" r="15.5" fill="none" stroke="#ffd9c2" stroke-width="8" stroke-dasharray="30 70" stroke-linecap="round" transform="rotate(-90 21 21)"/>
-                    <circle cx="21" cy="21" r="15.5" fill="none" stroke="#ffb380" stroke-width="8" stroke-dasharray="18 82" stroke-linecap="round" transform="rotate(-20 21 21)"/>
+                    <circle cx="21" cy="21" r="15.5" fill="none" stroke="green" stroke-width="8"/>
+                    <circle cx="21" cy="21" r="15.5" fill="none" stroke="purple" stroke-width="8" stroke-dasharray="30 70" stroke-linecap="round" transform="rotate(-90 21 21)"/>
+                    <circle cx="21" cy="21" r="15.5" fill="none" stroke="orangered" stroke-width="8" stroke-dasharray="18 82" stroke-linecap="round" transform="rotate(-20 21 21)"/>
                     <circle cx="21" cy="21" r="8" fill="#fff"/>
                   </svg>
                 </div>
                 <div style="display:flex;flex-direction:column;gap:8px;margin-top:6px">
-                  <div style="display:flex;justify-content:space-between"><div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:#ff7a00;display:inline-block"></span><span>Batata</span></div><div style="color:var(--muted)">74.6%</div></div>
-                  <div style="display:flex;justify-content:space-between"><div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:#ffd9c2;display:inline-block"></span><span>Cebola</span></div><div style="color:var(--muted)">5.0%</div></div>
-                  <div style="display:flex;justify-content:space-between"><div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:#ffb380;display:inline-block"></span><span>Frango</span></div><div style="color:var(--muted)">3.3%</div></div>
+                  <div style="display:flex;justify-content:space-between"><div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:green;display:inline-block"></span><span>Batata</span></div><div style="color:var(--muted)">74.6%</div></div>
+                  <div style="display:flex;justify-content:space-between"><div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:purple;display:inline-block"></span><span>Cebola</span></div><div style="color:var(--muted)">5.0%</div></div>
+                  <div style="display:flex;justify-content:space-between"><div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:orangered;display:inline-block"></span><span>Frango</span></div><div style="color:var(--muted)">3.3%</div></div>
                 </div>
               </div>
           </aside>
@@ -91,7 +93,7 @@
                 <div class="meta-muted" id="users-count-inline">0</div>
               </div>
 
-              <input id="user-search" class="user-search" style="border: solid 3px #000;" placeholder="Pesquisar usuários por nome..." />
+              <input id="user-search" class="user-search" style="border: solid 1px #000;" placeholder="Pesquisar usuários por nome..." />
 
               <div id="users-container">
                 <div id="users-list" class="users-list"></div>
@@ -131,7 +133,7 @@
         <h3>Avaliações</h3>
 
         <div class="denuncias-top">
-          <input type="text" id="search-denuncia" style="border: solid 3px #000; width: 350px; height: 35px; border-radius: 7px;" placeholder="Pesquisar avaliações..." />
+          <input type="text" id="search-denuncia" style="border: solid 1px #000; width: 350px; height: 35px; border-radius: 7px;" placeholder="Pesquisar avaliações..." />
         </div>
 
         <div id="denuncias-container" class="denuncias-container"></div>

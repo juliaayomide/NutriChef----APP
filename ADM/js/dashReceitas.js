@@ -135,7 +135,7 @@ document.addEventListener('DOMContentLoaded', () => {
         li.querySelector('.btn-ver').addEventListener('click', async () => {
           // tenta buscar a receita completa por id
           try {
-            const resp = await fetch(`http://localhost:3000/api/receita/${r.id}`);
+            const resp = await fetch(`http://localhost:3001/receitaDet/${r.id}`);
             if (resp.ok) {
               const full = await resp.json();
               abrirModalUnificado(full, 'cadastrada');
@@ -320,7 +320,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // ---------- MODAL UNIFICADO (VER + EDIT dentro do modal) ----------
+  // ---------- MODAL UNIFICADO0 (VER + EDIT dentro do modal) ----------
   // abrirModalUnificado(receita, source, options)
   function abrirModalUnificado(receita = {}, source = 'cadastrada', options = {}) {
     // options.startEditing -> se true, já ativa edição
@@ -388,6 +388,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // mostrar modal
     if (modalUnificado) modalUnificado.style.display = 'flex';
+                        modalUnificado.style.justifyContent = "center";
+                        modalUnificado.style.alignItems = "flex-start";
+
 
     // close handlers
     const fecharTop = document.getElementById('fechar-modal-top');
@@ -525,9 +528,13 @@ document.addEventListener('DOMContentLoaded', () => {
       const passosEdit = document.getElementById('modal-edit-passos');
       const novosPassos = passosEdit ? Array.from(passosEdit.querySelectorAll('li')).map(li => li.innerText.trim()).filter(Boolean) : (receita.passos || []);
 
+
+      console.log("ID da receita dentro do modal:", receita.id);
+      console.log("Receita completa:", receita);
+
       // montar payload mínimo
       const payload = {
-        id: receita.id,
+        id_receitas: receita.id || receita.id_receitas,
         nome: novoNome,
         autor: novoAutor,
         descricao: novaDesc,
