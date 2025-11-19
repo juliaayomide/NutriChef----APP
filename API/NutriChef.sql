@@ -133,8 +133,8 @@ INSERT INTO adm (nome, senha) VALUES
 ('Carlos Eduardo', 'senha123');
 
 -- Categorias
-INSERT INTO categorias (nome) VALUES
-('Bolos'),('Massas'),('Saladas'),('Diversos');
+-- INSERT INTO categorias (nome) VALUES
+-- ('Bolos'),('Massas'),('Saladas'),('Diversos');
 
 -- Ingredientes
 INSERT INTO ingredientes (nome, tipo, custo_ingrediente) VALUES

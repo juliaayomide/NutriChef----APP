@@ -36,11 +36,13 @@ const styles = StyleSheet.create({
   wrapper: {
     height: HEADER_HEIGHT, // reserva espaço no topo para o header
     width: '100%',
+    marginRight:50,
   },
   headerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
     width: '100%',
+    marginLeft:15,
     height: HEADER_HEIGHT,
     paddingVertical: 10,
     backgroundColor: '#fdfdfd',
@@ -56,7 +58,7 @@ const styles = StyleSheet.create({
   backButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#FF7F50',
+    backgroundColor: '#FF6300',
     paddingHorizontal: 12,
     paddingVertical: 6,
     borderRadius: 20,

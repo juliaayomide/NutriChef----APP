@@ -12,7 +12,7 @@ const app = express();
 
 // === CONFIGURAÇÃO DE CORS (permitir cookies da sessão) ===
 app.use(cors({
-  origin: 'http://localhost:5173', // altere se seu front estiver em outro host
+  origin: 'http://localhost:5173', 
   credentials: true
 }));
 
@@ -21,7 +21,7 @@ app.use(express.static(path.join(__dirname)));
 
 // === CONFIGURAÇÃO DE SESSÃO ===
 app.use(session({
-  secret: 'segredo_supersecreto', // troque por algo seguro
+  secret: 'segredo_supersecreto', 
   resave: false,
   saveUninitialized: false,
   cookie: {
@@ -88,6 +88,81 @@ app.post('/api/logout', (req, res) => {
 });
 
 // ==============================
+// 👥 ROTAS DE USUÁRIOS
+// ==============================
+app.get('/api/usuarios', async (req, res) => {
+  try {
+    const search = req.query.q ? `%${req.query.q}%` : '%';
+
+    const [rows] = await db.query(`
+      SELECT 
+        id_usuarios,
+        nome,
+        email,
+        foto,
+        DATE_FORMAT(data_cadastro, '%d/%m/%Y') AS data_cadastro
+      FROM usuarios
+      WHERE nome LIKE ? OR email LIKE ?
+      ORDER BY id_usuarios DESC
+    `, [search, search]);
+
+    res.json(rows);
+  } catch (err) {
+    console.error("❌ Erro ao buscar usuários:", err);
+    res.status(500).json({ error: "Erro ao buscar usuários" });
+  }
+});
+
+// Buscar usuário por ID
+app.get("/api/usuarios/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const [rows] = await db.query(`
+      SELECT 
+        id_usuarios,
+        nome,
+        email,
+        foto,
+        DATE_FORMAT(data_cadastro, '%d/%m/%Y') AS data_cadastro
+      FROM usuarios
+      WHERE id_usuarios = ?
+    `, [id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ error: "Usuário não encontrado." });
+    }
+
+    res.json(rows[0]);
+
+  } catch (err) {
+    console.error("❌ Erro ao buscar usuário por ID:", err);
+    res.status(500).json({ error: "Erro ao buscar usuário." });
+  }
+});
+
+app.delete("/api/usuarios/:id", async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    // apagar dependências primeiro
+    await db.query("DELETE FROM avaliacoes WHERE id_usuarios = ?", [id]);
+    await db.query("DELETE FROM favoritos WHERE id_usuario = ?", [id]); // CORREÇÃO AQUI
+
+    const [result] = await db.query("DELETE FROM usuarios WHERE id_usuarios = ?", [id]);
+
+    if (result.affectedRows === 0)
+      return res.status(404).json({ error: "Usuário não encontrado." });
+
+    res.json({ success: true, message: "Usuário excluído com sucesso!" });
+
+  } catch (err) {
+    console.error("❌ Erro ao excluir usuário:", err);
+    res.status(500).json({ error: "Erro ao excluir usuário." });
+  }
+});
+
+// ==============================
 // 📊 ROTA DE ESTATÍSTICAS
 // ==============================
 app.get('/api/stats', async (req, res) => {
@@ -105,6 +180,54 @@ app.get('/api/stats', async (req, res) => {
     res.status(500).json({ error: 'Erro ao buscar estatísticas' });
   }
 });
+
+
+app.get("/api/usuariosPorMes", async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        DATE_FORMAT(data_cadastro, '%Y-%m') AS mes,
+        COUNT(*) AS total
+      FROM usuarios
+      GROUP BY mes
+      ORDER BY mes;
+    `);
+    res.json(rows);
+  } catch (err) {
+    res.status(500).json({ erro: err });
+  }
+});
+
+// ==============================
+// 📊 GRÁFICO — Porcentagem de receitas por ingrediente
+// ==============================
+
+app.get("/api/graficos/ingredientes-populares", async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT i.nome AS ingrediente, COUNT(*) AS total
+      FROM receita_ingredientes ri
+      JOIN ingredientes i ON i.id_ingrediente = ri.id_ingrediente
+      GROUP BY i.nome
+      ORDER BY total DESC;
+    `);
+
+    if (rows.length <= 10) return res.json(rows);
+
+    const top10 = rows.slice(0, 10);
+    const outrosTotal = rows.slice(10).reduce((acc, item) => acc + item.total, 0);
+
+    return res.json([
+      ...top10,
+      { ingrediente: "Outros", total: outrosTotal }
+    ]);
+
+  } catch (err) {
+    console.error("Erro ao obter ingredientes populares:", err);
+    res.status(500).json({ erro: err.message });
+  }
+});
+
 
 // ==============================
 // 👨‍💼 ROTAS DE ADMINISTRADORES
@@ -252,8 +375,7 @@ app.post("/api/atualizar-receita", async (req, res) => {
             idDificuldade,
             id_categoria,
             id_ingrediente_base,
-            tempo_preparo,
-            imagem
+            tempo_preparo
         } = req.body;
 
         console.log("BODY RECEBIDO:", req.body);
@@ -272,7 +394,6 @@ app.post("/api/atualizar-receita", async (req, res) => {
             id_categoria ?? null,
             id_ingrediente_base ?? null,
             tempo_preparo ?? null,
-            imagem ?? null,
             id_receitas
         ];
 
@@ -286,8 +407,7 @@ app.post("/api/atualizar-receita", async (req, res) => {
                 idDificuldade = ?,
                 id_categoria = ?,
                 id_ingrediente_base = ?,
-                tempo_preparo = ?,
-                imagem = ?
+                tempo_preparo = ?
             WHERE id_receitas = ?
         `;
 

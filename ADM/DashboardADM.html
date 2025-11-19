@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="./css/dashReceitas.css">
   <link rel="stylesheet" href="./css/dashAvaliacoes.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
 </head>
 <body>
 <div class="app">
@@ -17,13 +19,18 @@
     <nav>
       <a class="nav-item active" href="#" data-screen="dashboard">Dashboard</a>
       <a class="nav-item" href="#" data-screen="receitas">Receitas</a>
-      <a class="nav-item" href="#" data-screen="denuncias">Avaliações</a>
-      <a class="nav-item" href="#"data-screen="receitasRecebidas">Solicitação de Receitas</a>
+      <!-- <a class="nav-item" href="#" data-screen="denuncias">Avaliações</a> -->
+      <a class="nav-item" href="#"data-screen="graficos">Gráficos</a>
     </nav>
   
   </aside>
 
   <main class="main">
+    <div id="admin-fixed-name">
+      <div id="admin-info" style="color:var(--muted);font-size:13px"></div>
+      <!-- <div class="avatar"></div> -->
+    </div>
+
     <div class="card topbar">
       <div class="top-left">
         <div class="title" id="page-title">Visão Geral</div>
@@ -31,10 +38,6 @@
         <div class="search" style="display: none;">
           <input placeholder="Pesquisar..." id="global-search">
         </div>
-      </div>
-      <div class="icons">
-        <div id="admin-info" style="margin-top:auto;color:var(--muted);font-size:13px"></div>
-        <!-- <div class="avatar"></div> -->
       </div>
     </div>
 
@@ -64,12 +67,18 @@
               </div>
             </div>
           </div>
-
       <aside>
-            <h4 style="margin:1px 1px 12px">Ingredientes mais procurados</h4>
+       
+            <h4>Usuários cadastrados por mês</h4>
+            <div class="card" style="padding:15px">
+              <canvas id="graficoUsuarios" width="300" height="200"></canvas>
+            </div>
+
+        <!-- GRAFICO ESTaTICO -->
+            <!-- <h4 style="margin:1px 1px 12px">Ingredientes mais procurados</h4>
                <div class="card" style="padding:10px">
                 <div class="donut">
-                  <!-- simple svg donut mock -->
+                  
                   <svg viewBox="0 0 42 42" width="220" height="140">
                     <circle cx="21" cy="21" r="15.5" fill="none" stroke="green" stroke-width="8"/>
                     <circle cx="21" cy="21" r="15.5" fill="none" stroke="purple" stroke-width="8" stroke-dasharray="30 70" stroke-linecap="round" transform="rotate(-90 21 21)"/>
@@ -82,7 +91,7 @@
                   <div style="display:flex;justify-content:space-between"><div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:purple;display:inline-block"></span><span>Cebola</span></div><div style="color:var(--muted)">5.0%</div></div>
                   <div style="display:flex;justify-content:space-between"><div style="display:flex;gap:8px;align-items:center"><span style="width:10px;height:10px;border-radius:50%;background:orangered;display:inline-block"></span><span>Frango</span></div><div style="color:var(--muted)">3.3%</div></div>
                 </div>
-              </div>
+              </div> -->
           </aside>
 
           
@@ -139,16 +148,19 @@
         <div id="denuncias-container" class="denuncias-container"></div>
       </section>
 
-      <!-- SOLICITAÇÃO RECEITAS -->
-      <section class="card" id="screen-receitasRecebidas" style="display:none">
-        <h3>Receitas Recebidas</h3>
+      <!-- Gráficos  -->
+      <section class="card" id="screen-graficos" style="display:none">
 
-        <div class="receitas-top">
-          <input type="text" id="search-receita-recebida" placeholder="Pesquisar receita..." />
+        <h3>Gráficos Gerais</h3>
+
+        <div class="card" style="padding:20px; margin-bottom:20px;">
+            <h4>Ingredientes mais usados (%)</h4>
+            <canvas id="graficoIngredientes" width="400" height="250"></canvas>
         </div>
 
-        <div id="receitas-recebidas-container" class="receitas-container"></div>
-      </section>
+        <div id="lista-legenda-ingredientes" class="legenda-lista"></div>
+
+    </section>
 
       <!-- Modal de Receitas -->
       <div id="modal-receita" class="modal" style="display:none;">
@@ -159,6 +171,95 @@
     </div>
   </main>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+async function carregarUsuarios() {
+  try {
+    const res = await fetch("http://localhost:3000/api/usuariosPorMes");
+    const dados = await res.json();
+
+    const labels = dados.map(x => x.mes);
+    const valores = dados.map(x => x.total);
+
+    const ctx = document.getElementById("graficoUsuarios").getContext("2d");
+
+    // Gradiente suave azul
+    const gradient = ctx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, "rgba(0, 122, 255, 0.35)");
+    gradient.addColorStop(1, "rgba(0, 122, 255, 0)");
+
+    new Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: "Usuários cadastrados",
+          data: valores,
+          borderColor: "rgb(255, 119, 0)",
+          backgroundColor: gradient,
+          borderWidth: 3,
+          fill: true,
+          tension: 0.4,
+          pointRadius: 4,
+          pointBackgroundColor: "rgb(250, 137, 50)",
+          pointBorderWidth: 2,
+          pointHoverRadius: 7,
+          pointHoverBackgroundColor: "white",
+          pointHoverBorderColor: "rgb(250, 137, 50)",
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            labels: {
+              font: { size: 13, weight: "600" },
+              color: "#444"
+            }
+          },
+          tooltip: {
+            backgroundColor: "rgba(30, 30, 30, 0.85)",
+            padding: 10,
+            titleFont: { size: 14, weight: "bold" },
+            bodyFont: { size: 13 },
+            cornerRadius: 8
+          }
+        },
+        scales: {
+          y: {
+            beginAtZero: true,
+            ticks: {
+              font: { size: 12 },
+              color: "#666"
+            },
+            grid: {
+              color: "rgba(0,0,0,0.08)"
+            }
+          },
+          x: {
+            ticks: {
+              font: { size: 12 },
+              color: "#666"
+            },
+            grid: { display: false }
+          }
+        }
+      }
+    });
+
+  } catch (err) {
+    console.error("Erro ao carregar gráfico:", err);
+  }
+}
+
+carregarUsuarios();
+</script>
+
 
 
   <script src="./js/dashUsuario.js"></script>

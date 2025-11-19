@@ -22,11 +22,39 @@ export async function buscarTodasReceitas() {
 // ===============================
 // 🔎 BUSCAR RECEITAS PELOS TERMOS (vários ingredientes)
 // ===============================
+// Função para normalizar texto (tira acentos e coloca minúsculo)
+function normalize(str) {
+  return str
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .toLowerCase();
+}
+
+// Distância de Levenshtein (mede erro de digitação)
+function levenshtein(a, b) {
+  const matriz = Array.from({ length: a.length + 1 }, () => []);
+
+  for (let i = 0; i <= a.length; i++) matriz[i][0] = i;
+  for (let j = 0; j <= b.length; j++) matriz[0][j] = j;
+
+  for (let i = 1; i <= a.length; i++) {
+    for (let j = 1; j <= b.length; j++) {
+      const custo = a[i - 1] === b[j - 1] ? 0 : 1;
+      matriz[i][j] = Math.min(
+        matriz[i - 1][j] + 1,
+        matriz[i][j - 1] + 1,
+        matriz[i - 1][j - 1] + custo
+      );
+    }
+  }
+
+  return matriz[a.length][b.length];
+}
+
 export async function buscarReceitas(termo = "") {
   const conn = await conexao();
 
   try {
-    // Busca todas as receitas (nome e descrição)
     const [rows] = await conn.execute(`
       SELECT id_receitas, nome, descricao 
       FROM receitas
@@ -34,21 +62,46 @@ export async function buscarReceitas(termo = "") {
 
     await conn.end();
 
-    // Se não tem termo, retorna tudo
     if (!termo.trim()) return rows;
 
-    // Configuração do Fuse
-    const options = {
-      keys: ["nome", "descricao"],
-      threshold: 0.4, // quanto menor, mais precisa (0 = exato, 1 = muito tolerante)
-      includeScore: true,
-    };
+    // Divide termos
+    const termos = termo
+      .split(",")
+      .map((t) => normalize(t.trim()))
+      .filter(Boolean);
 
-    const fuse = new Fuse(rows, options);
-    const resultados = fuse.search(termo);
+    const resultados = rows
+      .map((receita) => {
+        const texto = normalize(`${receita.nome} ${receita.descricao}`);
+        const palavras = texto.split(/\s+/);
 
-    // Retorna só os itens encontrados
-    return resultados.map((r) => r.item);
+        let matchCount = 0;
+
+        termos.forEach((t) => {
+          let encontrou = false;
+
+          // 1️⃣ Checa se o termo aparece direto
+          if (texto.includes(t)) {
+            encontrou = true;
+          } else {
+            // 2️⃣ Se não encontrou, tenta fuzzy
+            for (const palavra of palavras) {
+              if (levenshtein(t, palavra) <= 2) {
+                encontrou = true;
+                break;
+              }
+            }
+          }
+
+          if (encontrou) matchCount++;
+        });
+
+        return { ...receita, matchCount };
+      })
+      .filter((r) => r.matchCount > 0)
+      .sort((a, b) => b.matchCount - a.matchCount);
+
+    return resultados;
 
   } catch (err) {
     console.error("Erro ao buscar receitas:", err);

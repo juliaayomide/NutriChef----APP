@@ -206,7 +206,7 @@ export default function CadastroLogin({ navigation }) {
           ) : null}
 
           <TouchableOpacity onPress={() => irPara("login")}>
-            <Text style={styles.link}>Já tenho uma conta</Text>
+            <Text style={styles.link2}>Já tenho uma conta</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -215,7 +215,7 @@ export default function CadastroLogin({ navigation }) {
       {tela === "login" && (
         <View style={styles.screen}>
 
-          <Text style={[styles.title, { color: "#e68900" }]}>Entrar</Text>
+          <Text style={[styles.title, { color: "#FF6300" }]}>Entrar</Text>
           <Text style={styles.text}>
             Bem-vindo de volta, sentimos sua falta!
           </Text>
@@ -234,9 +234,7 @@ export default function CadastroLogin({ navigation }) {
             onChangeText={(text) => setForm({ ...form, senha: text })}
           />
 
-          <TouchableOpacity onPress={() => alert("Recuperar senha em breve!")}>
-            <Text style={styles.link}>Esqueceu sua senha?</Text>
-          </TouchableOpacity>
+          
 
           <TouchableOpacity style={styles.buttonLogin} onPress={handleLogin}>
             <Text style={styles.buttonText}>Entrar</Text>
@@ -254,6 +252,10 @@ export default function CadastroLogin({ navigation }) {
             </Text>
           ) : null}
 
+          <TouchableOpacity onPress={() => alert("Recuperar senha em breve!")}>
+            <Text style={styles.link}>Esqueceu sua senha?</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity onPress={() => irPara("cadastro")}>
             <Text style={styles.link}>Criar uma nova conta</Text>
           </TouchableOpacity>
@@ -266,9 +268,9 @@ export default function CadastroLogin({ navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: "#fff", alignItems: "center", justifyContent: "center" },
   screen: { width: "85%", alignItems: "center" },
-  logo: { fontSize: 30, fontWeight: "bold", color: "#e68900", marginBottom: 10 },
+  logo: { fontSize: 30, fontWeight: "bold", color: "#FF6300", marginBottom: 10 },
   title: { fontSize: 24, fontWeight: "bold", marginBottom: 5 },
-  text: { textAlign: "center", color: "#333", marginBottom: 20 },
+  text: { textAlign: "center", color: "#000000ff", marginBottom: 20 },
   input: {
     width: "100%",
     borderWidth: 1,
@@ -278,17 +280,19 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   buttonLogin: {
-    backgroundColor: "#e68900",
+    backgroundColor: '#FF6300',
+   marginBottom:5,
     padding: 12,
     borderRadius: 8,
     width: "100%",
     alignItems: "center",
   },
   buttonCadastro: {
-    backgroundColor: "#333",
+    backgroundColor: "#000000ff",
     padding: 12,
     borderRadius: 8,
     width: "100%",
+    marginBottom: 5,
     alignItems: "center",
     marginTop: 5,
   },
@@ -297,4 +301,6 @@ const styles = StyleSheet.create({
   mensagem: { marginTop: 10, fontSize: 15, textAlign: "center" },
   sucesso: { color: "green" },
   erro: { color: "red" },
+  link: { marginBottom: 10,  marginTop: 5 },
+  link2: { color: "#333", marginTop: 15 },
 });

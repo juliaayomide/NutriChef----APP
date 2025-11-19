@@ -7,7 +7,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 // 🔹 Gera uma cor fixa e vibrante com base no nome
 function getColorFromName(name) {
-  const colors = ['#E63946', '#F4A261', '#2A9D8F', '#E9C46A', '#457B9D', '#8D99AE', '#FF6B6B'];
+  const colors = ['#f1923aff', '#de6868ff', 'rgba(141, 211, 144, 1)', 'rgba(241, 209, 93, 1)'];
   const index = name.charCodeAt(0) % colors.length;
   return colors[index];
 }

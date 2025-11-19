@@ -67,3 +67,27 @@
   color: var(--muted);
   font-size: 13px;
 }
+
+
+.user-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-vermais {
+  background: #3498db;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.btn-excluir {
+  background: #e74c3c;
+  border: none;
+  color: white;
+  padding: 5px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}

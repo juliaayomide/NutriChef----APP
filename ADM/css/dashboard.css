@@ -227,3 +227,41 @@
   line-height: 1.5;
 }
 
+#admin-fixed-name {
+  position: absolute;
+  top: 10px;       /* ajuste para alinhar na barra amarela */
+  right: 90px;     /* posição onde a barra amarela termina */
+  font-size: 14px;
+  color: #000;
+  font-weight: 600;
+  pointer-events: none; /* evita clique indevido */
+  z-index: 9999;  /* para ficar acima de tudo */
+}
+
+
+/* Gráfico de ingredientes*/
+#graficoIngredientes {
+    max-width: 280px;
+    max-height: 280px;
+    margin: 0 auto;
+}
+
+.legenda-lista {
+    margin-top: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 14px;
+}
+
+.legenda-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.legenda-cor {
+    width: 12px;
+    height: 12px;
+    border-radius: 3px;
+}

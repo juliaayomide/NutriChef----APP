@@ -61,13 +61,7 @@ export default function Categoria({ route, navigation }) {
         <Text style={styles.title}>{nome}</Text>
 
         <Text style={styles.description}>
-          Pensar em colocar uma descrição aqui, que nem no{' '}
-          <Text 
-            style={styles.link} 
-            onPress={() => window.open('https://www.tudogostoso.com.br/categorias/1091-recheio-de-bolo', '_blank')}
-          >
-            TudoGostoso
-          </Text>
+       Explore diferentes categorias e encontre pratos que combinam com o seu gosto, com o seu tempo e com a sua ocasião.
         </Text>
 
         <View style={styles.sectionHeader}>
@@ -134,6 +128,7 @@ const styles = StyleSheet.create({
   },
   recipeCard: {
     width: 160,
+    height: 195,
     marginRight: 15,
     borderRadius: 8,
     overflow: 'hidden',

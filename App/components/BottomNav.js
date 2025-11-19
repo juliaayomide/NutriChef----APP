@@ -5,7 +5,7 @@ export default function BottomNav({ navigation, active, isLoggedIn }) {
   const items = [
     { name: 'Início', icon: 'https://cdn-icons-png.flaticon.com/512/25/25694.png', route: 'Home' },
     { name: 'Categorias', icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828859.png', route: 'allCategorias' },
-    { name: '', icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png', route: 'NovaReceita', plus: true },
+    // { name: '', icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png', route: 'NovaReceita', plus: true }, //
     { name: 'Favoritos', icon: 'https://cdn-icons-png.flaticon.com/512/833/833472.png', route: 'Favoritos' },
     { name: 'Perfil', icon: 'https://cdn-icons-png.flaticon.com/512/1077/1077063.png', route: isLoggedIn ? 'CadastroLogin' : 'Perfil' },
   ];
@@ -21,7 +21,7 @@ export default function BottomNav({ navigation, active, isLoggedIn }) {
           <Image
             source={{ uri: item.icon }}
             style={styles.icon}
-            tintColor={active === item.route ? '#FFA500' : '#555'}
+            tintColor={active === item.route ? '#FF6300' : '#555'}
           />
           <Text style={[styles.label, active === item.route && styles.labelActive]}>
             {item.name}
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     paddingVertical: 6,
   },
   plusItem: {
-    backgroundColor: '#FFA500',
+    backgroundColor: '#FF6300',
     borderRadius: 50,
     width: 70,
     height: 70,
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   labelActive: {
-    color: '#FFA500',
+    color: '#FF6300',
     fontWeight: '600',
   },
   active: {

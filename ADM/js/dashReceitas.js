@@ -68,30 +68,50 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // --------- NAV e troca de telas ----------
-  const screens = ['dashboard','receitas','denuncias','receitasRecebidas'];
-  navItems.forEach(item => {
-    item.addEventListener('click', e => {
-      e.preventDefault();
-      navItems.forEach(i => i.classList.remove('active'));
-      item.classList.add('active');
-      const screen = item.getAttribute('data-screen');
-      pageTitle.textContent =
-        screen === 'dashboard' ? 'Visão Geral' :
-        screen === 'receitas' ? 'Receitas Cadastradas' :
-        screen === 'receitasRecebidas' ? 'Solicitações de Receitas' :
-        'Avaliações';
+const screens = ['dashboard', 'receitas', 'denuncias', 'graficos'];
 
-      screens.forEach(s => {
-        const sec = document.getElementById('screen-'+s);
-        if (sec) sec.style.display = (s === screen) ? 'block' : 'none';
-      });
+navItems.forEach(item => {
+  item.addEventListener('click', e => {
+    e.preventDefault();
 
-      // carregar dados quando abrir cada aba
-      if (screen === 'receitas') fetchReceitas(); // lista cadastradas
-      if (screen === 'receitasRecebidas') carregarReceitasRecebidas(); // importadas
-      if (screen === 'denuncias') fetchDenuncias();
+    // Atualiza menu ativo
+    navItems.forEach(i => i.classList.remove('active'));
+    item.classList.add('active');
+
+    // Nome da tela
+    const screen = item.getAttribute('data-screen');
+
+    // Atualiza título da página
+    pageTitle.textContent =
+      screen === 'dashboard' ? 'Visão Geral' :
+      screen === 'receitas' ? 'Receitas Cadastradas' :
+      screen === 'denuncias' ? 'Avaliações' :
+      screen === 'graficos' ? 'Gráficos Gerais' :
+      '';
+
+    // Exibe apenas a tela selecionada
+    screens.forEach(s => {
+      const sec = document.getElementById('screen-' + s);
+      if (sec) sec.style.display = (s === screen) ? 'block' : 'none';
     });
+
+    // Carregar dados quando abrir cada aba
+    if (screen === 'receitas') {
+      fetchReceitas();
+    }
+
+    if (screen === 'denuncias') {
+      fetchDenuncias();
+    }
+
+    if (screen === 'graficos') {
+      // Aguarda a tela aparecer antes de carregar o gráfico
+      setTimeout(() => {
+        carregarGraficos();
+      }, 50);
+    }
   });
+});
 
   // ---------- RECEITAS CADASTRADAS (API) ----------
   async function fetchReceitas(query = '') {
@@ -725,7 +745,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  async function fetchIngredientes() {
+ async function fetchIngredientes() {
     try {
       const res = await fetch('http://localhost:3000/api/ingredientes');
       const data = await res.json();
@@ -744,9 +764,69 @@ document.addEventListener('DOMContentLoaded', () => {
         `;
       });
     } catch (err) {
-      console.error('Erro fetchIngredientes', err);
+      console.error("Erro fetchIngredientes", err);
     }
   }
+
+  async function carregarGraficos() {
+    await graficoIngredientes();
+  }
+
+  async function graficoIngredientes() {
+    try {
+        const res = await fetch("http://localhost:3000/api/graficos/ingredientes-populares");
+        const dados = await res.json();
+
+        const labels = dados.map(x => x.ingrediente);
+        const valores = dados.map(x => Number(x.total));
+
+        const ctx = document.getElementById("graficoIngredientes");
+
+        if (!ctx) {
+            console.error("❌ Canvas graficoIngredientes não encontrado!");
+            return;
+        }
+
+        // Evitar recriar o gráfico várias vezes
+        if (window.graficoIngredientesInstancia) {
+            window.graficoIngredientesInstancia.destroy();
+        }
+
+        window.graficoIngredientesInstancia = new Chart(ctx, {
+            type: "doughnut",
+            data: {
+                labels,
+                datasets: [{
+                    label: "Uso dos ingredientes",
+                    data: valores,
+                    backgroundColor: [
+                        "#FF6384","#36A2EB","#FFCE56",
+                        "#4BC0C0","#9966FF","#FF9F40",
+                        "#66FF99","#C9CBCF"
+                    ]
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function (context) {
+                                const total = valores.reduce((a, b) => a + b, 0);
+                                const v = context.raw;
+                                const p = ((v / total) * 100).toFixed(1);
+                                return `${context.label}: ${v} receitas (${p}%)`;
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+    } catch (err) {
+        console.error("Erro ao gerar gráfico de ingredientes:", err);
+    }
+  }
+
 
   // ---------- Expose some functions to global if needed (optional) ----------
   window.abrirModalUnificado = abrirModalUnificado;
@@ -754,3 +834,4 @@ document.addEventListener('DOMContentLoaded', () => {
   window.carregarReceitasRecebidas = carregarReceitasRecebidas;
   window.renderReceitasRecebidasPagina = renderReceitasRecebidasPagina;
 });
+

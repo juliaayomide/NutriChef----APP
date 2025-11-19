@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useContext } from 'react';
 import { 
   View, 
   Text, 
@@ -10,38 +10,14 @@ import {
 } from 'react-native';
 import Header from '../components/Voltar';
 import BottomNav from '../components/BottomNav';
-
-const initialReceitas = [
-  {
-    id: '1',
-    nome: 'Pudim de Microondas',
-    tempo: '10 - 70 min',
-    imagem: 'https://www.receiteria.com.br/wp-content/uploads/receitas-de-pudim-de-leite-condensado.jpg',
-  },
-  {
-    id: '2',
-    nome: 'Panqueca de Carne',
-    tempo: '40 - 170 min',
-    imagem: 'https://tudodelicious.com/wp-content/uploads/2025/04/Panqueca-de-carne-moida-1024x1024.jpg',
-  },
-  {
-    id: '3',
-    nome: 'Salada Caesar',
-    tempo: '40 - 90 min',
-    imagem: 'https://p2.trrsf.com/image/fget/cf/1200/900/middle/images.terra.com/2023/02/28/whatsapp-image-2023-02-28-at-01-53-47-(1)-1iyhprrq5e9tc.jpeg',
-  },
-];
+import { FavoritesContext } from '../contexts/FavoritesContext';
 
 export default function Favoritos({ navigation, usuario }) {
-  const [receitas, setReceitas] = useState(initialReceitas);
+  const { favorites, toggleFavorite } = useContext(FavoritesContext);
   const { width } = useWindowDimensions();
 
   const numColumns = width > 400 ? 2 : 1;
   const cardWidth = (width - 30 - (numColumns - 1) * 15) / numColumns;
-
-  const removerFavorito = (id) => {
-    setReceitas((prev) => prev.filter((r) => r.id !== id));
-  };
 
   const renderItem = ({ item }) => (
     <View style={[styles.recipeCard, { width: cardWidth }]}>
@@ -54,7 +30,9 @@ export default function Favoritos({ navigation, usuario }) {
         <Text style={styles.recipeName}>{item.nome}</Text>
         <Text style={styles.recipeTime}>⏱ {item.tempo}</Text>
       </View>
-      <TouchableOpacity style={styles.heartBtn} onPress={() => removerFavorito(item.id)}>
+
+      {/* ❤️ Botão para remover */}
+      <TouchableOpacity style={styles.heartBtn} onPress={() => toggleFavorite(item)}>
         <Text style={styles.heartText}>❤️</Text>
       </TouchableOpacity>
     </View>
@@ -65,11 +43,11 @@ export default function Favoritos({ navigation, usuario }) {
       <Header navigation={navigation} />
 
       <FlatList
-        key={numColumns} // força reconstrução quando numColumns muda
+        key={numColumns}
         contentContainerStyle={styles.content}
-        data={receitas}
+        data={favorites}
         renderItem={renderItem}
-        keyExtractor={(item) => item.id}
+        keyExtractor={(item) => item.id.toString()}
         numColumns={numColumns}
         columnWrapperStyle={numColumns > 1 ? { justifyContent: 'space-between', marginBottom: 15 } : null}
         showsVerticalScrollIndicator={false}
@@ -82,13 +60,8 @@ export default function Favoritos({ navigation, usuario }) {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#fff',
-  },
-  content: {
-    padding: 15,
-  },
+  container: { flex: 1, backgroundColor: '#fff' },
+  content: { padding: 15 },
   emptyText: {
     fontSize: 16,
     color: '#888',
@@ -112,9 +85,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
-  recipeInfo: {
-    padding: 10,
-  },
+  recipeInfo: { padding: 10 },
   recipeName: {
     fontWeight: 'bold',
     fontSize: 16,
