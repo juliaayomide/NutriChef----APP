@@ -100,13 +100,13 @@ export default function Pesquisa({ navigation }) {
       </Text>
 
       <Text style={styles.sectionTitle}>Sugestões de ingredientes:</Text>
-      {renderButtons(ingredientes, '#ff4d4d')}
+      {renderButtons(ingredientes, '#5c760dff')}
 
       <Text style={styles.sectionTitle}>Sugestões de carnes:</Text>
-      {renderButtons(carnes, '#ff914d')}
+      {renderButtons(carnes, '#651300ff')}
 
       <Text style={styles.sectionTitle}>Sugestões de verduras e frutas:</Text>
-      {renderButtons(verdurasFrutas, '#82cd47')}
+      {renderButtons(verdurasFrutas, '#8934ceff')}
 
       <Text style={styles.sectionTitle}>Grãos e laticínios:</Text>
       {renderButtons(graosLaticinios, '#ffd166')}

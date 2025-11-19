@@ -5,7 +5,8 @@ import {
   Image, 
   FlatList, 
   ScrollView, 
-  TouchableOpacity, 
+  TouchableOpacity,
+  Footer,
   StyleSheet, 
   ActivityIndicator 
 } from 'react-native';
@@ -80,7 +81,7 @@ export default function ReceitaDet({ route, navigation }) {
         <Text key={index} style={styles.step}>{index + 1}. {passo}</Text>
       ))}
 
-        {/* 🍎 TABELA NUTRICIONAL */}
+        {/* TABELA NUTRICIONAL */}
         {tabela ? (
           <View style={styles.nutriContainer}>
             <Text style={styles.nutriTitle}>Tabela Nutricional (por porção)</Text>
@@ -110,7 +111,9 @@ export default function ReceitaDet({ route, navigation }) {
         ) : (
           <Text style={styles.noData}>Informações nutricionais não disponíveis.</Text>
         )}
-
+              <View style={styles.footer}>
+                <Text style={styles.footerText}> NutriChef © 2025 </Text>
+              </View>
     </ScrollView>
   );
 }
@@ -184,48 +187,61 @@ const styles = StyleSheet.create({
     marginBottom: 5,
     marginLeft: 10,
   },
-  // 🍎 Estilos da tabela nutricional
+  // Estilos da tabela nutricional
   nutriContainer: {
     marginTop: 25,
-    backgroundColor: '#FFF7EC',
+    backgroundColor: '#ffffffff',
     borderRadius: 10,
     padding: 15,
-    shadowColor: '#000',
-    shadowOpacity: 0.1,
-    shadowRadius: 5,
+    shadowColor: '#1a1a1aff',
+    shadowOpacity: 1,
+    shadowRadius: 15,
   },
   nutriTitle: {
     fontSize: 18,
     fontWeight: '700',
-    color: '#FF7F50',
+    color: '#ff4400ff',
     marginBottom: 10,
     textAlign: 'center',
   },
   nutriTable: {
-    borderTopWidth: 1,
-    borderColor: '#FF7F50',
+    borderTopWidth: 2,
+    borderColor: '#000000ff',
   },
   nutriRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 5,
-    borderBottomWidth: 0.5,
-    borderColor: '#FFD3B6',
+    borderBottomWidth: 0.8,
+    borderColor: '#000000ff',
   },
   nutriLabel: {
-    fontSize: 14,
-    color: '#444',
+    fontSize: 16,
+    color: '#000000ff',
     fontWeight: '600',
   },
   nutriValue: {
-    fontSize: 14,
-    color: '#333',
+    fontSize: 15,
+    color: '#050505ff',
   },
   noData: {
     marginTop: 10,
     fontSize: 14,
-    color: '#777',
+    color: '#464646ff',
     fontStyle: 'italic',
     textAlign: 'center',
   },
+  footer: {
+  marginTop: 30,
+  backgroundColor: '#ff6127ff',
+  borderTopWidth: 1,
+  borderColor: '#fffefeff',
+  alignItems: 'center',
+  justifyContent: 'center',
+},
+footerText: {
+  color: '#000000ff',
+  fontSize: 12,
+},
+
 });
