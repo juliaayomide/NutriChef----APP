@@ -9,7 +9,6 @@ const userSearchInput = document.getElementById('user-search');
 
 async function fetchUsuarios(query = "") {
   try {
-    // 🔍 Correção de digitação (remove acentos e normaliza)
     function normalize(str) {
       return str
         .normalize("NFD")
@@ -29,7 +28,7 @@ async function fetchUsuarios(query = "") {
 
     let users = await res.json();
 
-    // Filtro extra no front eliminando erros de digitação
+    // 🔍 Filtro extra no front
     if (query.trim() !== "") {
       const nq = normalize(query);
 
@@ -39,16 +38,14 @@ async function fetchUsuarios(query = "") {
       );
     }
 
-    // Atualiza contador
-    const inlineCounter = document.getElementById("users-count-inline");
-    inlineCounter.textContent =
+    // Atualiza contadores
+    document.getElementById("users-count-inline").textContent =
       users.length + (users.length === 1 ? " usuário" : " usuários");
 
-    // Atualiza total no dashboard principal
     const totalUsuarios = document.getElementById("total-usuarios");
     if (totalUsuarios) totalUsuarios.textContent = users.length;
 
-    // Se vazio
+    // Lista vazia
     if (!users || users.length === 0) {
       usersListEl.innerHTML = "";
       noUsersMsgEl.style.display = "block";
@@ -57,8 +54,9 @@ async function fetchUsuarios(query = "") {
       noUsersMsgEl.style.display = "none";
     }
 
-    // Renderizar lista
+    // Renderização
     usersListEl.innerHTML = "";
+
     users.forEach(u => {
       const avatar =
         u.foto && typeof u.foto === "string" && u.foto.trim() !== ""
@@ -78,12 +76,18 @@ async function fetchUsuarios(query = "") {
 
           <div class="user-actions">
             <button class="btn-vermais" onclick="abrirModalUsuario(${u.id_usuarios})">Ver Mais</button>
-            <button class="btn-excluir" onclick="excluirUsuario(${u.id_usuarios})">Excluir</button>
+
+            ${
+              u.status === "suspenso"
+                ? `<button class="btn-ativar" onclick="abrirModalMotivoAtivar(${u.id_usuarios})">Ativar</button>`
+                : `<button class="btn-suspender" onclick="abrirModalMotivoSuspender(${u.id_usuarios})">Suspender</button>`
+            }
           </div>
 
         </div>
       `;
     });
+
   } catch (err) {
     console.error("Erro fetchUsuarios", err);
     usersListEl.innerHTML = "";
@@ -92,59 +96,133 @@ async function fetchUsuarios(query = "") {
   }
 }
 
-// Debounce da busca
+function abrirModalMotivoSuspender(id) {
+  usuarioAtual = { id_usuarios: id };
+  abrirModalMotivo("suspender");
+}
+
+function abrirModalMotivoAtivar(id) {
+  usuarioAtual = { id_usuarios: id };
+  abrirModalMotivo("ativar");
+}
+
+// =====================
+// Busca
+// =====================
+
 userSearchInput.addEventListener('input', e => {
   const q = e.target.value.trim();
   if (userSearchTimeout) clearTimeout(userSearchTimeout);
   userSearchTimeout = setTimeout(() => fetchUsuarios(q), 250);
 });
 
-// Também atualiza ao digitar no campo global
 document.getElementById('global-search').addEventListener('input', e => {
   const q = e.target.value.trim();
   fetchUsuarios(q);
 });
 
+// =====================
+// Modal de Usuário
+// =====================
 
-async function excluirUsuario(id) {
-  if (!confirm("Deseja realmente excluir este usuário?")) return;
-
-  const res = await fetch(`http://localhost:3000/api/usuarios/${id}`, {
-    method: "DELETE"
-  });
-
-  const data = await res.json();
-
-  if (data.success) {
-    alert("Usuário removido!");
-    fetchUsuarios(); // recarregar lista
-  } else {
-    alert("Erro ao excluir usuário.");
-  }
-}
-
+let usuarioAtual = null;
+let acaoAtual = null;
 
 async function abrirModalUsuario(id) {
   try {
     const res = await fetch(`http://localhost:3000/api/usuarios/${id}`);
-    if (!res.ok) {
-      alert("Usuário não encontrado!");
-      return;
-    }
+    if (!res.ok) return alert("Usuário não encontrado!");
 
     const u = await res.json();
+    usuarioAtual = u;
 
-    alert(`
-Nome: ${u.nome}
-Email: ${u.email}
-ID: ${u.id_usuarios}
-Cadastrado em: ${u.data_cadastro}
-    `);
+    document.getElementById("modal-nome").textContent = u.nome;
+    document.getElementById("modal-email").textContent = u.email;
+    document.getElementById("modal-id").textContent = u.id_usuarios;
+    document.getElementById("modal-data").textContent = u.data_cadastro;
+
+    // Alterna botões corretamente
+    if (u.status === "suspenso") {
+      document.getElementById("btn-suspender").style.display = "none";
+      document.getElementById("btn-ativar").style.display = "block";
+    } else {
+      document.getElementById("btn-suspender").style.display = "block";
+      document.getElementById("btn-ativar").style.display = "none";
+    }
+
+    document.getElementById("modal-usuario").classList.remove("hidden");
+
   } catch (err) {
-    console.error("Erro ao abrir modal:", err);
-    alert("Erro ao buscar informações do usuário.");
+    console.error(err);
+    alert("Erro ao buscar usuário.");
   }
 }
 
+// Fechar modal
+document.getElementById("fechar-modal-usuario").addEventListener("click", () => {
+  document.getElementById("modal-usuario").classList.add("hidden");
+});
+
+document.getElementById("modal-usuario").addEventListener("click", e => {
+  if (e.target.id === "modal-usuario") {
+    document.getElementById("modal-usuario").classList.add("hidden");
+  }
+});
+
+// =====================
+// MODAL MOTIVO
+// =====================
+
+function abrirModalMotivo(acao) {
+  acaoAtual = acao;
+  document.getElementById("motivo-texto").value = "";
+  document.getElementById("modal-motivo").classList.remove("hidden");
+}
+
+document.getElementById("fechar-modal-motivo").addEventListener("click", () => {
+  document.getElementById("modal-motivo").classList.add("hidden");
+});
+
+// =====================
+// AÇÕES: Suspender / Ativar
+// =====================
+
+document.getElementById("btn-suspender").addEventListener("click", () => {
+  abrirModalMotivo("suspender");
+});
+
+document.getElementById("btn-ativar").addEventListener("click", () => {
+  abrirModalMotivo("ativar");
+});
+
+document.getElementById("confirmar-motivo").addEventListener("click", async () => {
+  const motivo = document.getElementById("motivo-texto").value.trim();
+  if (motivo.length < 3) return alert("Digite um motivo válido.");
+
+  const endpoint =
+    acaoAtual === "suspender"
+      ? "http://localhost:3000/api/usuarios/suspender"
+      : "http://localhost:3000/api/usuarios/ativar";
+
+  const res = await fetch(endpoint, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ id: usuarioAtual.id_usuarios, motivo })
+  });
+
+  const data = await res.json();
+  if (!data.success) return alert("Erro ao aplicar ação.");
+
+  alert("Ação realizada com sucesso!");
+
+  document.getElementById("modal-motivo").classList.add("hidden");
+  document.getElementById("modal-usuario").classList.add("hidden");
+
+  fetchUsuarios();
+});
+
+// =====================
 // Inicialização
+// =====================
+
 fetchUsuarios();

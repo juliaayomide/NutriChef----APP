@@ -253,7 +253,7 @@ END;
 
 DELIMITER ;
 
-select*from receitas
+select*from usuarios
 
 ALTER TABLE usuarios
 ADD status VARCHAR(20) DEFAULT 'ativo';

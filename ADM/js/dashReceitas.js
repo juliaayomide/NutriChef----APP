@@ -534,34 +534,59 @@ navItems.forEach(item => {
 
     // salvar click
     if (btnSalvar) btnSalvar.addEventListener('click', async () => {
-      // coletar campos atualizados
-      const novoNome = document.getElementById('modal-nome')?.innerText.trim() || '';
-      const novoAutor = document.getElementById('modal-autor')?.innerText.trim() || '';
-      const novaDesc = document.getElementById('modal-descricao')?.innerText.trim() || '';
+      const novoNome = document.getElementById('modal-nome')?.innerText.trim() || receita.nome;
+      const novoAutor = document.getElementById('modal-autor')?.innerText.trim() || receita.autor;
+      const novaDesc = document.getElementById('modal-descricao')?.innerText.trim() || receita.descricao;
 
       const ingEdit = document.getElementById('modal-edit-ingredientes');
-      const novosIngredientes = ingEdit ? Array.from(ingEdit.querySelectorAll('li')).map(li => li.innerText.trim()).filter(Boolean) : (receita.ingredientes || []);
+      const novosIngredientes = ingEdit 
+          ? Array.from(ingEdit.querySelectorAll('li'))
+              .map(li => li.innerText.trim())
+              .filter(Boolean)
+          : receita.ingredientes;
 
       const utEdit = document.getElementById('modal-edit-utensilios');
-      const novosUtensilios = utEdit ? Array.from(utEdit.querySelectorAll('li')).map(li => li.innerText.trim()).filter(Boolean) : (receita.utensilios || []);
+      const novosUtensilios = utEdit
+          ? Array.from(utEdit.querySelectorAll('li'))
+              .map(li => li.innerText.trim())
+              .filter(Boolean)
+          : receita.utensilios;
 
       const passosEdit = document.getElementById('modal-edit-passos');
-      const novosPassos = passosEdit ? Array.from(passosEdit.querySelectorAll('li')).map(li => li.innerText.trim()).filter(Boolean) : (receita.passos || []);
+      const novosPassos = passosEdit
+          ? Array.from(passosEdit.querySelectorAll('li'))
+              .map(li => li.innerText.trim())
+              .filter(Boolean)
+          : receita.passos;
 
-
-      console.log("ID da receita dentro do modal:", receita.id);
-      console.log("Receita completa:", receita);
-
-      // montar payload mínimo
+      // GARANTIR QUE VALORES VAZIOS NÃO SUBSTITUEM OS ORIGINAIS
       const payload = {
         id_receitas: receita.id || receita.id_receitas,
-        nome: novoNome,
-        autor: novoAutor,
-        descricao: novaDesc,
-        instrucoes: novaDesc,
-        ingredientes: novosIngredientes,
-        utensilios: novosUtensilios,
-        passos: novosPassos
+
+        // CAMPOS EDITADOS
+        nome: novoNome || receita.nome,
+        descricao: novaDesc || receita.descricao,
+        instrucoes: novaDesc || receita.instrucoes,
+
+        ingredientes: novosIngredientes?.length 
+          ? novosIngredientes 
+          : receita.ingredientes,
+
+        utensilios: novosUtensilios?.length
+          ? novosUtensilios
+          : receita.utensilios,
+
+        passos: novosPassos?.length
+          ? novosPassos
+          : receita.passos,
+
+        // CAMPOS OCULTOS NO MODAL → precisam ser mantidos
+        tempo_preparo: receita.tempo_preparo ?? receita.tempo ?? null,
+        id_categoria: receita.id_categoria ?? null,
+        id_ingrediente_base: receita.id_ingrediente_base ?? null,
+        idDificuldade: receita.idDificuldade ?? null,
+        porcoes: receita.porcoes ?? null,
+        custo_aproximado: receita.custo_aproximado ?? null
       };
 
       try {
@@ -570,7 +595,9 @@ navItems.forEach(item => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload)
         });
+
         const data = await res.json();
+
         if (data.success) {
           alert('Receita atualizada com sucesso!');
         } else {
@@ -580,18 +607,15 @@ navItems.forEach(item => {
         console.error('Erro salvar edição', err);
         alert('Erro ao salvar alterações.');
       } finally {
-        // atualizar UI modal e lists localmente
-        // atualizar objeto receita para futuras ações
-        receita.nome = novoNome;
-        receita.autor = novoAutor;
-        receita.descricao = novaDesc;
-        receita.instrucoes = novaDesc;
-        receita.ingredientes = novosIngredientes;
-        receita.utensilios = novosUtensilios;
-        receita.passos = novosPassos;
+        // Atualiza a receita original
+        receita.nome = payload.nome;
+        receita.descricao = payload.descricao;
+        receita.instrucoes = payload.instrucoes;
+        receita.ingredientes = payload.ingredientes;
+        receita.utensilios = payload.utensilios;
+        receita.passos = payload.passos;
 
         disableEditing();
-        // atualizar lista de cadastradas
         fetchReceitas(searchCadastradas?.value || '');
       }
     });

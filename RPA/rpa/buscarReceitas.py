@@ -9,7 +9,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
 # ==============================
-# 🔌 CONEXÃO COM O BANCO
+# CONEXÃO COM O BANCO
 # ==============================
 def conectar_mysql():
     try:
@@ -20,14 +20,14 @@ def conectar_mysql():
             database="nutrichef"
         )
         if conn.is_connected():
-            print("✅ Conectado ao MySQL")
+            print("[OK] Conectado ao MySQL")
             return conn
     except Error as e:
-        print(f"❌ Erro ao conectar ao MySQL: {e}")
+        print(f"[ERRO] Falha ao conectar ao MySQL: {e}")
         exit()
 
 # ==============================
-# 🔧 FUNÇÕES AUXILIARES
+# FUNÇÕES AUXILIARES
 # ==============================
 def limpar_ingrediente(texto):
     texto = re.sub(r'^[^\w]+', '', texto)
@@ -36,7 +36,9 @@ def limpar_ingrediente(texto):
 def normalizar_tempo(tempo_texto):
     if not tempo_texto:
         return None
+
     tempo_texto = tempo_texto.lower().strip()
+    
     if "pá-pum" in tempo_texto or "pa-pum" in tempo_texto:
         return 20
     elif "até 1h" in tempo_texto or tempo_texto == "1h":
@@ -47,11 +49,13 @@ def normalizar_tempo(tempo_texto):
         return 150
     elif "mais de 1h" in tempo_texto:
         return 90
+
     combinado = re.search(r"(\d+)\s*h\s*(\d+)?", tempo_texto)
     if combinado:
         h = int(combinado.group(1))
         m = int(combinado.group(2)) if combinado.group(2) else 0
         return h * 60 + m
+
     minutos = re.search(r"(\d+)\s*min", tempo_texto)
     return int(minutos.group(1)) if minutos else None
 
@@ -62,7 +66,7 @@ def parse_porcoes(texto):
     return int(nums[-1]) if nums else 1
 
 # ==============================
-# 🍳 DETECÇÃO DE UTENSÍLIOS
+# DETECÇÃO DE UTENSÍLIOS
 # ==============================
 UTENSILIOS_CONHECIDOS = [
     "frigideira", "panela", "assadeira", "tigela", "colher", "batedeira",
@@ -76,10 +80,10 @@ def detectar_utensilios(passos):
     return list(set(encontrados))
 
 # ==============================
-# 🍎 CLASSIFICAÇÃO E FILTROS
+# CLASSIFICAÇÃO E FILTROS
 # ==============================
 def classificar_categoria(nome, ingredientes, modo_preparo):
-    # 🔧 Garante que ingredientes e modo_preparo sejam texto
+
     if isinstance(ingredientes, list):
         ingredientes = " ".join(ingredientes)
     if isinstance(modo_preparo, list):
@@ -87,83 +91,56 @@ def classificar_categoria(nome, ingredientes, modo_preparo):
 
     texto = f"{nome.lower()} {ingredientes.lower()} {modo_preparo.lower()}"
 
-    # ⚠️ Remove termos genéricos que causam falsos positivos
     ignorar = [
-        "colher de sopa", "colheres de sopa",
-        "colher de chá", "colheres de chá",
-        "páprica doce", "folhas de coentro",
-        "pimenta-do-reino", "sal a gosto",
-        "azeite", "óleo", "água"
+        "colher de sopa", "colheres de sopa", "colher de chá",
+        "colheres de chá", "páprica doce", "folhas de coentro",
+        "pimenta-do-reino", "sal a gosto", "azeite", "óleo", "água"
     ]
     for termo in ignorar:
         texto = texto.replace(termo, "")
 
-    # 🍗 Pratos principais / proteicos
-    if any(t in texto for t in [
-        "frango", "carne", "peixe", "tofu", "ovo",
-        "mignon", "proteína", "bife", "assado",
-        "grelhado", "cozido"
-    ]):
+    if any(t in texto for t in ["frango", "carne", "peixe", "tofu", "ovo",
+                                "mignon", "proteína", "bife", "assado",
+                                "grelhado", "cozido"]):
         return "Pratos Proteicos"
 
-    # 🍚 Acompanhamentos
-    if any(t in texto for t in [
-        "arroz", "feijão", "lentilha", "grão-de-bico",
-        "grão de bico", "batata", "mandioca", "purê",
-        "polenta", "farofa", "vinagrete"
-    ]):
+    if any(t in texto for t in ["arroz", "feijão", "lentilha", "grão-de-bico",
+                                "grão de bico", "batata", "mandioca", "purê",
+                                "polenta", "farofa", "vinagrete"]):
         return "Acompanhamentos"
 
-    # 🥗 Saladas
     if "salada" in nome.lower() or "salada" in texto:
         return "Saladas"
 
-    # 🍰 Bolos e doces
-    if any(t in texto for t in [
-        "bolo", "torta", "sobremesa", "doce",
-        "brigadeiro", "tapioca", "compota",
-        "pudim", "crumble", "mousse"
-    ]):
+    if any(t in texto for t in ["bolo", "torta", "sobremesa", "doce",
+                                "brigadeiro", "tapioca", "compota",
+                                "pudim", "crumble", "mousse"]):
         return "Doces"
 
-    # 🍝 Massas
-    if any(t in texto for t in [
-        "macarrão", "espaguete", "massa", "lasanha",
-        "nhoque", "ravioli", "fettuccine", "penne"
-    ]):
+    if any(t in texto for t in ["macarrão", "espaguete", "massa", "lasanha",
+                                "nhoque", "ravioli", "fettuccine", "penne"]):
         return "Massas"
 
-    # ☕ Bebidas
-    if any(t in texto for t in [
-        "suco", "vitamina", "smoothie", "milkshake",
-        "café", "chá", "drink", "coquetel", "bellini",
-        "gelado", "refrescante", "bebida"
-    ]):
+    if any(t in texto for t in ["suco", "vitamina", "smoothie", "milkshake",
+                                "café", "chá", "drink", "coquetel", "bellini",
+                                "gelado", "refrescante", "bebida"]):
         return "Bebidas"
 
-    # 🥣 Sopas e caldos (mas evita falsos positivos)
     if any(t in texto for t in ["sopa", "caldo", "ensopado", "creme de", "sopa fria"]):
-        # ⛔ Evita doces, bebidas, pães, granola, etc.
         if any(bad in texto for bad in [
-            "iogurte", "granola", "pão", "smoothie", "manga",
-            "banana", "aveia", "muesli", "crumble", "gelado",
-            "bebida", "vitamina", "fruta"
+            "iogurte", "granola", "pão", "smoothie", "manga", "banana",
+            "aveia", "muesli", "crumble", "gelado", "bebida", "vitamina", "fruta"
         ]):
             return "Diversos"
         return "Sopas e Caldos"
 
-    # 🍞 Diversos (pães, granola, etc)
-    if any(t in texto for t in [
-        "pão", "granola", "aveia", "quinoa", "cuscuz",
-        "muesli", "focaccia", "torrada", "picles"
-    ]):
+    if any(t in texto for t in ["pão", "granola", "aveia", "quinoa", "cuscuz",
+                                "muesli", "focaccia", "torrada", "picles"]):
         return "Diversos"
 
-    # ♻️ Reaproveitamento
     if "reaproveitamento" in nome.lower():
         return "Reaproveitamento"
 
-    # 🔄 Caso não se encaixe em nenhuma
     return "Outros"
 
 
@@ -177,7 +154,7 @@ def eh_saudavel(ingredientes):
     return not any(p in texto for p in INGREDIENTES_ULTRAPROCESSADOS)
 
 # ==============================
-# 💾 INSERÇÃO NO BANCO
+# INSERÇÃO NO BANCO
 # ==============================
 def inserir_categoria(cursor, nome_categoria):
     cursor.execute("SELECT id_categorias FROM categorias WHERE nome=%s", (nome_categoria,))
@@ -208,7 +185,7 @@ def salvar_receitas_no_banco(conn, receitas, termo):
     for r in receitas:
         try:
             if not eh_saudavel(r["ingredientes"]):
-                print(f"🚫 {r['nome']} descartada (ultraprocessado).")
+                print(f"[DESCARTADA] {r['nome']} (contém ultraprocessados).")
                 continue
 
             categoria = classificar_categoria(
@@ -222,7 +199,7 @@ def salvar_receitas_no_banco(conn, receitas, termo):
 
             cursor.execute("SELECT id_receitas FROM receitas WHERE nome=%s", (r["nome"],))
             if cursor.fetchone():
-                print(f"⚠️ Receita já existente: {r['nome']}")
+                print(f"[AVISO] Receita já existe no banco: {r['nome']}")
                 continue
 
             cursor.execute("""
@@ -262,14 +239,14 @@ def salvar_receitas_no_banco(conn, receitas, termo):
                 """, (id_receita, passo, idx))
 
             conn.commit()
-            print(f"💾 Receita salva: {r['nome']} ({categoria})")
+            print(f"[SALVA] {r['nome']} (categoria: {categoria})")
 
         except Error as e:
             conn.rollback()
-            print(f"❌ Erro ao salvar {r['nome']}: {e}")
+            print(f"[ERRO] Ao salvar '{r['nome']}': {e}")
 
 # ==============================
-# 🤖 COLETA VIA SELENIUM
+# SCRAPING VIA SELENIUM
 # ==============================
 def coletar_panelinha_selenium(termo, max_receitas=15):
     options = Options()
@@ -328,54 +305,34 @@ def coletar_panelinha_selenium(termo, max_receitas=15):
                 "imagem": imagem
             })
 
-            print(f"🍴 Coletada: {nome}")
+            print(f"[COLETADA] {nome}")
 
         except Exception as e:
-            print(f"⚠️ Erro ao coletar receita ({link}): {e}")
+            print(f"[ERRO] Falha ao coletar receita ({link}): {e}")
 
     driver.quit()
     return receitas
 
 # ==============================
-# 🏁 EXECUÇÃO
+# EXECUÇÃO DIRETA
 # ==============================
 if __name__ == "__main__":
+    import sys
+
+    if len(sys.argv) < 2:
+        print("Uso correto: python buscarReceitas.py <termo>")
+        sys.exit(1)
+
+    termo = sys.argv[1]
+    print(f"\n[INÍCIO] Coletando receitas para o termo: '{termo}'\n")
+
     conn = conectar_mysql()
+    receitas = coletar_panelinha_selenium(termo, max_receitas=15)
 
-    termos = [
-        # 🥩 Pratos proteicos
-        "frango", "carne moída", "peixe", "ovo", "tofu",
-
-        # 🍚 Acompanhamentos
-        "arroz integral", "feijão", "lentilha", "grão de bico", "batata",
-
-        # 🥗 Saladas
-        "salada de folhas", "salada de legumes", "salada de frutas",
-
-        # 🍝 Massas
-        "macarrão", "espaguete", "lasanha", "nhoque", "massa caseira",
-
-        # 🍰 Doces e sobremesas
-        "bolo de cenoura", "bolo de chocolate", "sobremesa", "doce", "torta",
-  
-        # 🍹 Bebidas e vitaminas
-        "suco natural", "vitamina de banana", "chá gelado", "smoothie",
-
-        # 🌾 Integrais e saudáveis
-        "aveia", "granola", "pão integral", "cuscuz", "quinoa",
-
-        # 🌽 Legumes e verduras
-        "legumes", "verduras", "abóbora", "brócolis", "espinafre", "couve"
-    ]
-
-
-    for termo in termos:
-        print(f"\n🍽️ Coletando receitas de {termo}...")
-        receitas = coletar_panelinha_selenium(termo, max_receitas=15)
-        if receitas:
-            salvar_receitas_no_banco(conn, receitas, termo)
-        else:
-            print(f"⚠️ Nenhuma receita encontrada para {termo}")
+    if receitas:
+        salvar_receitas_no_banco(conn, receitas, termo)
+    else:
+        print(f"[ZERO] Nenhuma receita encontrada para '{termo}'")
 
     conn.close()
-    print("\n✅ Coleta finalizada com sucesso!")
+    print("\n[FIM] Processo concluído com sucesso.")

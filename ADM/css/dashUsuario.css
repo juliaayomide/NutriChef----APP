@@ -83,11 +83,122 @@
   cursor: pointer;
 }
 
-.btn-excluir {
-  background: #e74c3c;
+/* ===========================
+    MODAL DE USUÁRIO
+=========================== */
+
+.modal-usuario {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(4px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 30px;
+  z-index: 9999;
+}
+
+.modal-usuario.hidden {
+  display: none;
+}
+
+.modal-content {
+  background: #ffffff;
+  padding: 35px 40px;
+  width: 100%;
+  max-width: 520px;      /* 🔥 MAIS LARGO */
+  border-radius: 18px;   /* 🔥 CANTOS MAIS BONITOS */
+  box-shadow: 0 6px 22px rgba(0,0,0,0.18);
+  animation: modalIn 0.25s ease;
+  position: relative;
+  font-family: Arial, sans-serif;
+}
+
+.modal-content h2 {
+  margin-top: 0;
+  text-align: center;
+  margin-bottom: 25px;
+  color: #222;
+  font-size: 26px;       /* 🔥 TÍTULO MAIOR */
+  font-weight: 700;
+  letter-spacing: 0.3px;
+}
+
+.modal-info-item {
+  margin: 14px 0;
+  font-size: 18px;       /* 🔥 TEXTO MAIOR E LEGÍVEL */
+  line-height: 1.5;
+  color: #333;
+}
+
+/* Botão de fechar */
+.close-btn {
+  position: absolute;
+  top: 14px;
+  right: 18px;
+  font-size: 30px;
   border: none;
-  color: white;
+  background: none;
+  cursor: pointer;
+  color: #666;
+  transition: 0.2s;
+}
+
+.close-btn:hover {
+  color: #000;
+  transform: scale(1.08);
+}
+
+/* Animação suave */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.modal-actions {
+  margin-top: 25px;
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+}
+
+.btn {
+  flex: 1;
+  padding: 12px 15px;
+  font-size: 16px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.btn-suspender {
+  background: #ff4d4d;
+  border: none;
+  color: #fff;
   padding: 5px 10px;
   border-radius: 6px;
-  cursor: pointer;
+}
+
+.btn-suspender:hover {
+  background: #d63b3b;
+}
+
+.btn-ativar {
+  background: #2ecc71;
+  border: none;
+  padding: 5px 10px;
+  border-radius: 6px;
+  color: #fff;
+}
+
+.btn-ativar:hover {
+  background: #28b765;
 }

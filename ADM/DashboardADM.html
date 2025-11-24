@@ -46,11 +46,20 @@
       <section class="card" id="screen-dashboard">
         <div class="grid">
           <div>
-            <h3 style="margin:0 0 14px 0;font-weight:700">Sites mais utilizados</h3>
-            <div class="list-card" id="sites-list"></div>
-
+          
             <div style="height:18px"></div>
-
+              <button id="btn-rpa" class="btn btn-rpa" style="
+                margin-bottom:15px;
+                padding:10px 16px;
+                background:#ff7f00;
+                border:none;
+                border-radius:8px;
+                color:white;
+                font-weight:600;
+                cursor:pointer;
+              ">
+                Adicionar receitas (RPA)
+              </button>
             <div class="stats">
               <div class="stat">
                 <div class="label">Receitas postadas</div>
@@ -168,6 +177,67 @@
           <div id="conteudo-receita"></div>
         </div>
       </div>
+
+      <!-- Modal de Usuário -->
+      <div id="modal-usuario" class="modal-usuario hidden">
+        <div class="modal-content">
+          <button class="close-btn" id="fechar-modal-usuario">×</button>
+
+          <h2>Informações do Usuário</h2>
+
+          <div class="modal-info-item"><strong>Nome:</strong> <span id="modal-nome"></span></div>
+          <div class="modal-info-item"><strong>Email:</strong> <span id="modal-email"></span></div>
+          <div class="modal-info-item"><strong>ID:</strong> <span id="modal-id"></span></div>
+          <div class="modal-info-item"><strong>Cadastrado em:</strong> <span id="modal-data"></span></div>
+          
+          <div class="modal-actions">
+            <button id="btn-suspender" class="btn suspender">Suspender Usuário</button>
+            <button id="btn-ativar" class="btn ativar">Ativar Usuário</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="modal-motivo" class="modal-usuario hidden">
+        <div class="modal-content">
+          <button class="close-btn" id="fechar-modal-motivo">×</button>
+
+          <h2>Motivo</h2>
+
+          <textarea id="motivo-texto"
+            placeholder="Descreva o motivo..."
+            style="width: 100%; height: 120px; padding: 10px; resize: none; font-size: 16px;">
+          </textarea>
+
+          <button id="confirmar-motivo" class="btn ativar" style="margin-top: 20px;">Confirmar</button>
+        </div>
+      </div>
+
+      <div id="modal-rpa" class="modal-usuario hidden">
+        <div class="modal-content">
+          <button class="close-btn" id="fechar-modal-rpa">×</button>
+
+          <h2>Adicionar receitas</h2>
+
+          <p>Informe o termo para buscar receitas automaticamente na RPA:</p>
+
+          <input id="rpa-termo"
+                placeholder="Ex: frango, bolo de chocolate, salada…"
+                style="width:100%; padding:10px; font-size:16px; margin-top:10px; border-radius:6px; border:1px solid #ccc;" />
+
+          <button id="btn-executar-rpa"
+                  style="margin-top:20px; width:100%; padding:12px; background:#ff7f00; color:white; border:none; border-radius:6px; font-size:16px; font-weight:bold; cursor:pointer;">
+            Executar coleta
+          </button>
+
+          <!-- LOADER DE PORCENTAGEM -->
+          <div id="loader-progress" class="loader-progress-container" style="display:none;">
+            <div class="progress-circle">
+              <div id="progress-number">0%</div>
+            </div>
+            <span id="progress-text">Coletando receitas...</span>
+          </div>
+        </div>
+      </div>
     </div>
   </main>
 </div>
@@ -175,6 +245,171 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+
+function atualizarProgresso(valor) {
+  const circle = document.querySelector(".progress-circle");
+  const number = document.getElementById("progress-number");
+
+  circle.style.background = `conic-gradient(#ff7f00 ${valor}%, #ddd ${valor}%)`;
+  number.textContent = `${valor}%`;
+}
+
+
+
+const modalRpa = document.getElementById("modal-rpa");
+const btnRpa = document.getElementById("btn-rpa");
+const fecharRpa = document.getElementById("fechar-modal-rpa");
+const btnExecutarRpa = document.getElementById("btn-executar-rpa");
+const inputTermo = document.getElementById("rpa-termo");
+
+// abrir modal
+btnRpa.addEventListener("click", () => {
+  modalRpa.classList.remove("hidden");
+});
+
+// fechar modal
+fecharRpa.addEventListener("click", () => {
+  modalRpa.classList.add("hidden");
+});
+
+// enviar termo para backend que chama o script Python
+btnExecutarRpa.addEventListener("click", async () => {
+  const termo = inputTermo.value.trim();
+
+  if (!termo) {
+    alert("Digite um termo!");
+    return;
+  }
+
+  // esconder formulário e mostrar loader
+  btnExecutarRpa.style.display = "none";
+  inputTermo.style.display = "none";
+  const loader = document.getElementById("loader-progress");
+  loader.style.display = "flex";
+
+  const fases = [
+    { pct: 5,   msg: "Enviando termo para a RPA..." },
+    { pct: 25,  msg: "Abrindo navegador virtual..." },
+    { pct: 45,  msg: `Buscando receitas para '${termo}'...` },
+    { pct: 65,  msg: "Processando dados coletados..." },
+    { pct: 85,  msg: "Validando receitas..." },
+  ];
+
+  let idx = 0;
+
+  function avancarFase() {
+    if (idx < fases.length) {
+      atualizarProgresso(fases[idx].pct);
+      document.getElementById("progress-text").innerText = fases[idx].msg;
+      idx++;
+    }
+  }
+
+  // executa fases em intervalos automáticos
+  const faseInterval = setInterval(avancarFase, 900);
+
+  try {
+    const response = await fetch("http://localhost:3000/api/rpa", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ termo })
+    });
+
+    const data = await response.json();
+
+    clearInterval(faseInterval);
+
+    // Mostrar fase final (100%)
+    atualizarProgresso(100);
+    document.getElementById("progress-text").innerText = "Salvando no banco de dados...";
+
+    setTimeout(() => {
+      loader.style.display = "none";
+      btnExecutarRpa.style.display = "block";
+      inputTermo.style.display = "block";
+      modalRpa.classList.add("hidden");
+
+      btnExecutarRpa.innerText = "Executar coleta";
+      btnExecutarRpa.disabled = false;
+
+      if (data.success) {
+        alert("Coleta concluída! Receitas adicionadas.");
+      } else {
+        alert("Erro: " + (data.error || "Falha ao executar RPA"));
+      }
+    }, 800);
+
+  } catch (err) {
+    clearInterval(faseInterval);
+
+    alert("Erro ao conectar com o servidor.");
+
+    loader.style.display = "none";
+    btnExecutarRpa.style.display = "block";
+    inputTermo.style.display = "block";
+  }
+});
+
+
+btnExecutarRpa.addEventListener("click", async () => {
+  const termo = inputTermo.value.trim();
+
+  if (!termo) {
+    alert("Digite um termo!");
+    return;
+  }
+
+  // esconder formulário e mostrar loader
+  btnExecutarRpa.style.display = "none";
+  inputTermo.style.display = "none";
+  document.getElementById("loader-progress").style.display = "flex";
+
+  let progresso = 0;
+  const interval = setInterval(() => {
+    progresso = Math.min(progresso + 5, 95);
+    atualizarProgresso(progresso);
+  }, 300);
+
+  try {
+    const response = await fetch("http://localhost:3000/api/rpa", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ termo })
+    });
+
+    clearInterval(interval);
+    atualizarProgresso(100);
+
+    const data = await response.json();
+
+    setTimeout(() => {
+      document.getElementById("loader-progress").style.display = "none";
+      btnExecutarRpa.style.display = "block";
+      inputTermo.style.display = "block";
+      modalRpa.classList.add("hidden");
+
+      btnExecutarRpa.innerText = "Executar coleta";
+      btnExecutarRpa.disabled = false;
+
+      if (data.success) {
+        alert("Coleta concluída! Receitas adicionadas.");
+      } else {
+        alert("Erro: " + (data.error || "Falha ao executar RPA"));
+      }
+    }, 500);
+
+  } catch (err) {
+    clearInterval(interval);
+
+    alert("Erro ao conectar com o servidor.");
+
+    document.getElementById("loader-progress").style.display = "none";
+    btnExecutarRpa.style.display = "block";
+    inputTermo.style.display = "block";
+  }
+});
+
+
 
 async function carregarUsuarios() {
   try {

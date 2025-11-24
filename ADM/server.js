@@ -7,6 +7,7 @@ const mysql = require('mysql2/promise');
 const path = require('path');
 const fetch = require('node-fetch');
 const session = require('express-session');
+const { exec } = require("child_process");
 
 const app = express();
 
@@ -47,6 +48,35 @@ const db = mysql.createPool({
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'DashboardADM.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'cadastro.html')));
+
+
+// ---- ENDPOINT PARA EXECUTAR A RPA ----
+app.post("/api/rpa", (req, res) => {
+    const termo = req.body.termo;
+
+    if (!termo || termo.trim() === "") {
+        return res.status(400).json({ error: "Termo inválido" });
+    }
+
+    // Caminho absoluto até o arquivo buscarReceitas.py
+    const scriptPath = path.resolve("../RPA/rpa/buscarReceitas.py");
+
+    // Comando para executar
+    const comando = `python "${scriptPath}" "${termo}"`;
+
+    console.log("Executando:", comando);
+
+    exec(comando, (error, stdout, stderr) => {
+        if (error) {
+            console.error("Erro ao executar RPA:", stderr);
+            return res.status(500).json({ error: stderr });
+        }
+
+        console.log("RPA output:", stdout);
+        res.json({ success: true, log: stdout });
+    });
+});
+
 
 // ==============================
 // 🔐 AUTENTICAÇÃO E SESSÃO
@@ -100,6 +130,8 @@ app.get('/api/usuarios', async (req, res) => {
         nome,
         email,
         foto,
+        status,
+        motivo_suspensao,
         DATE_FORMAT(data_cadastro, '%d/%m/%Y') AS data_cadastro
       FROM usuarios
       WHERE nome LIKE ? OR email LIKE ?
@@ -124,6 +156,8 @@ app.get("/api/usuarios/:id", async (req, res) => {
         nome,
         email,
         foto,
+        status,
+        motivo_suspensao,
         DATE_FORMAT(data_cadastro, '%d/%m/%Y') AS data_cadastro
       FROM usuarios
       WHERE id_usuarios = ?
@@ -141,24 +175,52 @@ app.get("/api/usuarios/:id", async (req, res) => {
   }
 });
 
-app.delete("/api/usuarios/:id", async (req, res) => {
+// =========================
+// SUSPENDER USUÁRIO
+// =========================
+app.put("/api/usuarios/suspender", async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id, motivo } = req.body;
 
-    // apagar dependências primeiro
-    await db.query("DELETE FROM avaliacoes WHERE id_usuarios = ?", [id]);
-    await db.query("DELETE FROM favoritos WHERE id_usuario = ?", [id]); // CORREÇÃO AQUI
+    if (!motivo || motivo.length < 3) {
+      return res.status(400).json({ error: "Motivo inválido." });
+    }
 
-    const [result] = await db.query("DELETE FROM usuarios WHERE id_usuarios = ?", [id]);
+    await db.query(
+      "UPDATE usuarios SET status = 'suspenso', motivo_suspensao = ? WHERE id_usuarios = ?",
+      [motivo, id]
+    );
 
-    if (result.affectedRows === 0)
-      return res.status(404).json({ error: "Usuário não encontrado." });
-
-    res.json({ success: true, message: "Usuário excluído com sucesso!" });
+    res.json({ success: true, status: "suspenso" });
 
   } catch (err) {
-    console.error("❌ Erro ao excluir usuário:", err);
-    res.status(500).json({ error: "Erro ao excluir usuário." });
+    console.error("Erro ao suspender usuário:", err);
+    res.status(500).json({ error: "Erro ao suspender usuário." });
+  }
+});
+
+
+// =========================
+// ATIVAR USUÁRIO
+// =========================
+app.put("/api/usuarios/ativar", async (req, res) => {
+  try {
+    const { id, motivo } = req.body;
+
+    if (!motivo || motivo.length < 3) {
+      return res.status(400).json({ error: "Motivo inválido." });
+    }
+
+    await db.query(
+      "UPDATE usuarios SET status = 'ativo', motivo_suspensao = ? WHERE id_usuarios = ?",
+      [motivo, id]
+    );
+
+    res.json({ success: true, status: "ativo" });
+
+  } catch (err) {
+    console.error("Erro ao ativar usuário:", err);
+    res.status(500).json({ error: "Erro ao ativar usuário." });
   }
 });
 
