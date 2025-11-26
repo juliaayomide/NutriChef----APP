@@ -281,7 +281,7 @@ app.get("/api/graficos/ingredientes-populares", async (req, res) => {
 
     return res.json([
       ...top10,
-      { ingrediente: "Outros", total: outrosTotal }
+
     ]);
 
   } catch (err) {
