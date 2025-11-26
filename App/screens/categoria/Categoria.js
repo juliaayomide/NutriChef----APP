@@ -37,7 +37,7 @@ export default function Categoria({ route, navigation }) {
   const renderItem = ({ item }) => (
     <TouchableOpacity 
       style={styles.recipeCard} 
-      onPress={() => navigation.navigate('ReceitaDetalhe', { id: item.id_receitas })}
+      onPress={() => navigation.navigate('ReceitaDet', { id: item.id_receitas })}
     >
       <Image source={{ uri: item.imagem }} style={styles.recipeImage} />
       <Text style={styles.recipeName}>{item.nome}</Text>

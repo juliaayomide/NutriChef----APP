@@ -18,11 +18,6 @@ import { FavoritesProvider } from './contexts/FavoritesContext';
 
 const Stack = createNativeStackNavigator();
 
-
-//npm uninstall @react-native-async-storage/async-storage
-//npm install @react-native-async-storage/async-storage@1.23.1
-//npm start -c
-
 export default function App() {
   return (
     <FavoritesProvider>
