@@ -182,6 +182,8 @@ def inserir_utensilio(cursor, nome):
 
 def salvar_receitas_no_banco(conn, receitas, termo):
     cursor = conn.cursor(buffered=True)
+    total_salvas = 0  
+
     for r in receitas:
         try:
             if not eh_saudavel(r["ingredientes"]):
@@ -218,6 +220,7 @@ def salvar_receitas_no_banco(conn, receitas, termo):
             ))
             id_receita = cursor.lastrowid
 
+            # ingredientes
             for ing in r["ingredientes"]:
                 id_ing = inserir_ingrediente(cursor, limpar_ingrediente(ing))
                 cursor.execute("""
@@ -225,6 +228,7 @@ def salvar_receitas_no_banco(conn, receitas, termo):
                     VALUES (%s, %s, NULL, NULL)
                 """, (id_ing, id_receita))
 
+            # utensílios
             for ut in r["utensilios"]:
                 id_ut = inserir_utensilio(cursor, ut)
                 cursor.execute("""
@@ -232,6 +236,7 @@ def salvar_receitas_no_banco(conn, receitas, termo):
                     VALUES (%s, %s)
                 """, (id_receita, id_ut))
 
+            # passos
             for idx, passo in enumerate(r["preparo"], 1):
                 cursor.execute("""
                     INSERT INTO receita_passos (id_receitas, descricao, ordem)
@@ -239,11 +244,15 @@ def salvar_receitas_no_banco(conn, receitas, termo):
                 """, (id_receita, passo, idx))
 
             conn.commit()
+            total_salvas += 1     
             print(f"[SALVA] {r['nome']} (categoria: {categoria})")
 
         except Error as e:
             conn.rollback()
             print(f"[ERRO] Ao salvar '{r['nome']}': {e}")
+
+    return total_salvas 
+
 
 # ==============================
 # SCRAPING VIA SELENIUM
@@ -330,9 +339,13 @@ if __name__ == "__main__":
     receitas = coletar_panelinha_selenium(termo, max_receitas=15)
 
     if receitas:
-        salvar_receitas_no_banco(conn, receitas, termo)
+        total_salvas = salvar_receitas_no_banco(conn, receitas, termo)
     else:
+        total_salvas = 0
         print(f"[ZERO] Nenhuma receita encontrada para '{termo}'")
 
     conn.close()
+
+    print(f"TOTAL_SALVAS={total_salvas}")
+
     print("\n[FIM] Processo concluído com sucesso.")
