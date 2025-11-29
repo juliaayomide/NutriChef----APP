@@ -1,0 +1,6 @@
+/* assets/fonts.css */
+
+@font-face {
+  font-family: 'Lexend';
+  src: local('Lexend'), url('./fonts/Lexend.ttf') format('ttf');
+}

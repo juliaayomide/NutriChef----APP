@@ -3,6 +3,7 @@ import { ScrollView, View, Text, Image, TouchableOpacity, StyleSheet, ActivityIn
 import axios from "axios";
 import Header from "../components/Voltar";
 
+
 export default function ReceitasPorCategoria({ navigation }) {
   const [categorias, setCategorias] = useState([]);
   const [carregando, setCarregando] = useState(true);

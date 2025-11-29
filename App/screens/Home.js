@@ -1,9 +1,12 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, createContext } from 'react';
 import { StyleSheet, ImageBackground, ScrollView, View, Image, Text, TouchableOpacity, FlatList, Platform } from 'react-native';
 import Logo from '../components/Logo';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { useContext } from 'react';
+// index.js ou App.js
+
+
 import { FavoritesContext } from '../contexts/FavoritesContext';
 import BottomNav from '../components/BottomNav';
 
@@ -22,15 +25,23 @@ export default function Home({ navigation }) {
     )
   );
 
-  useEffect(() => {
+  
+
+   useEffect(() => {
     fetch('http://localhost:3001/')
       .then(res => res.json())
       .then(data => setReceitas(data))
       .catch(err => console.error('Erro ao carregar receitas:', err));
 
-    setUser(null);
+    // Checar se usuário está logado
+    fetch('http://localhost:3001/perfil', { credentials: "include" })
+      .then(res => res.json())
+      .then(data => {
+        if (data.success) setUser(data.usuario);
+      })
+      .catch(() => setUser(null));
   }, []);
-
+  
   function formatarTempo(minutos) {
     if (!minutos || isNaN(minutos)) return "Tempo não informado";
     const horas = Math.floor(minutos / 60);
@@ -54,11 +65,11 @@ export default function Home({ navigation }) {
       <TouchableOpacity
         style={styles.heartBtn}
         onPress={() => toggleFavorite({
-          id: item.id_receitas,
+          id_receita: item.id_receitas,
           nome: item.nome,
           tempo: formatarTempo(item.tempo_preparo),
           imagem: item.imagem
-        })}
+        }, user?.id_usuarios)}
       >
         <AntDesign
           name={isFavorite(item.id_receitas) ? "heart" : "hearto"}
@@ -192,7 +203,13 @@ export default function Home({ navigation }) {
         </View>
       </ScrollView>
 
-      <BottomNav navigation={navigation} active="Home" isLoggedIn={user !== null} />
+      <BottomNav
+  navigation={navigation}
+  active="Home"
+  isLoggedIn={user !== null}
+  usuario={user}
+/>
+
     </View>
   );
 }
@@ -203,7 +220,7 @@ const shadowStyle = Platform.select({
 });
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fafafa' },
+  screen: { flex: 1, backgroundColor: '#fafafa',fontFamily: 'Lexend' },
   scroll: { flex: 1, backgroundColor: '#fafafa' },
   headerContainer: {
     paddingTop: 40,

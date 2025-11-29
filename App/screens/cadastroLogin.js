@@ -10,6 +10,7 @@ import {
 } from "react-native";
 import Header from "../components/Voltar";
 
+
 export default function CadastroLogin({ navigation }) {
   const [tela, setTela] = useState("welcome");
   const [form, setForm] = useState({

@@ -1,13 +1,28 @@
 import React from 'react';
 import { View, TouchableOpacity, Image, Text, StyleSheet, Platform } from 'react-native';
 
-export default function BottomNav({ navigation, active, isLoggedIn }) {
+export default function BottomNav({ navigation, active, isLoggedIn, usuario }) {
+  
+  function handleFavoritos() {
+    if (!isLoggedIn) {
+      // Usuário não está logado → vai para CadastroLogin
+      return navigation.navigate("CadastroLogin");
+    }
+    // Usuário logado → vai para Favoritos
+    navigation.navigate("Favoritos");
+  }
+  
+
   const items = [
     { name: 'Início', icon: 'https://cdn-icons-png.flaticon.com/512/25/25694.png', route: 'Home' },
     { name: 'Categorias', icon: 'https://cdn-icons-png.flaticon.com/512/1828/1828859.png', route: 'allCategorias' },
-    // { name: '', icon: 'https://cdn-icons-png.flaticon.com/512/992/992651.png', route: 'NovaReceita', plus: true }, //
-    { name: 'Favoritos', icon: 'https://cdn-icons-png.flaticon.com/512/833/833472.png', route: 'Favoritos' },
-    { name: 'Perfil', icon: 'https://cdn-icons-png.flaticon.com/512/1077/1077063.png', route: isLoggedIn ? 'CadastroLogin' : 'Perfil' },
+    { 
+      name: 'Favoritos', 
+      icon: 'https://cdn-icons-png.flaticon.com/512/833/833472.png', 
+      route: 'Favoritos', 
+      onPress: handleFavoritos // aqui usamos a função customizada
+    },
+    { name: 'Perfil', icon: 'https://cdn-icons-png.flaticon.com/512/1077/1077063.png', route: 'Perfil' },
   ];
 
   return (
@@ -16,7 +31,7 @@ export default function BottomNav({ navigation, active, isLoggedIn }) {
         <TouchableOpacity
           key={index}
           style={[styles.navItem, item.plus && styles.plusItem, active === item.route && styles.active]}
-          onPress={() => navigation.navigate(item.route)}
+          onPress={item.onPress ? item.onPress : () => navigation.navigate(item.route)}
         >
           <Image
             source={{ uri: item.icon }}
@@ -47,7 +62,7 @@ const styles = StyleSheet.create({
     shadowOffset: { width: 0, height: -3 },
     shadowRadius: 5,
     elevation: 10,
-    position: 'relative', // não usa mais absolute para não sobrepor conteúdo
+    position: 'relative',
   },
   navItem: {
     alignItems: 'center',
@@ -60,7 +75,7 @@ const styles = StyleSheet.create({
     borderRadius: 50,
     width: 70,
     height: 70,
-    marginTop: -30, // eleva o botão acima da barra
+    marginTop: -30,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#000',

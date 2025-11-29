@@ -100,16 +100,16 @@ export default function Pesquisa({ navigation }) {
       </Text>
 
       <Text style={styles.sectionTitle}>Sugestões de ingredientes:</Text>
-      {renderButtons(ingredientes, '#5c760dff')}
+      {renderButtons(ingredientes, 'rgba(249, 116, 0, 1)')}
 
       <Text style={styles.sectionTitle}>Sugestões de carnes:</Text>
-      {renderButtons(carnes, '#651300ff')}
+      {renderButtons(carnes, '#ffd166')}
 
       <Text style={styles.sectionTitle}>Sugestões de verduras e frutas:</Text>
-      {renderButtons(verdurasFrutas, '#8934ceff')}
+      {renderButtons(verdurasFrutas, '#f82c33')}
 
       <Text style={styles.sectionTitle}>Grãos e laticínios:</Text>
-      {renderButtons(graosLaticinios, '#ffd166')}
+      {renderButtons(graosLaticinios, '#ffbd66ff')}
     </ScrollView>
   );
 }
@@ -122,12 +122,11 @@ const styles = StyleSheet.create({
     paddingTop: 20,
   },
   searchInput: {
-    backgroundColor: '#fff',
+    backgroundColor: '#f4f4f4',
     borderRadius: 25,
     paddingVertical: 10,
     paddingHorizontal: 15,
-    borderWidth: 1,
-    borderColor: '#ddd',
+    borderWidth: 0,
     fontSize: 16,
   },
   infoText: {
@@ -158,7 +157,7 @@ const styles = StyleSheet.create({
     elevation: 2,
   },
   selectedButton: {
-    backgroundColor: '#ff4d4d',
+    backgroundColor: '#ffffffff',
     borderWidth: 1,
     borderColor: '#cc0000',
   },
@@ -167,7 +166,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   selectedText: {
-    color: '#fff',
+    color: '#000000ff',
     fontWeight: 'bold',
   },
 });

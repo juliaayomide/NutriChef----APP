@@ -10,6 +10,7 @@ import {
   StyleSheet, 
   ActivityIndicator 
 } from 'react-native';
+
 import Logo from '../components/Logo';
 
 export default function ReceitaDet({ route, navigation }) {
@@ -111,9 +112,7 @@ export default function ReceitaDet({ route, navigation }) {
         ) : (
           <Text style={styles.noData}>Informações nutricionais não disponíveis.</Text>
         )}
-              <View style={styles.footer}>
-                <Text style={styles.footerText}> NutriChef © 2025 </Text>
-              </View>
+              
     </ScrollView>
   );
 }
@@ -193,7 +192,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#ffffffff',
     borderRadius: 10,
     padding: 15,
-    shadowColor: '#1a1a1aff',
+    shadowColor: '#e8e8e8ff',
     shadowOpacity: 1,
     shadowRadius: 15,
   },
@@ -206,14 +205,14 @@ const styles = StyleSheet.create({
   },
   nutriTable: {
     borderTopWidth: 2,
-    borderColor: '#000000ff',
+    borderColor: '##fafafa',
   },
   nutriRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 5,
     borderBottomWidth: 0.8,
-    borderColor: '#000000ff',
+    borderColor: '#d7d7d7ff',
   },
   nutriLabel: {
     fontSize: 16,

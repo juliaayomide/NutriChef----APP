@@ -14,6 +14,7 @@ import ConfigPerfil from './screens/perfil/configPerfil';
 import AlterPerfil from './screens/perfil/alterPerfil';
 import VerMais from './screens/VerMais';
 import NovaReceita from './screens/NovaReceita';
+
 import { FavoritesProvider } from './contexts/FavoritesContext';
 
 const Stack = createNativeStackNavigator();
