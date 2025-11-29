@@ -3,6 +3,7 @@
 .users-card {
   padding: 12px;
   margin-top: 16px;
+  font-family: 'Poppins', sans-serif ;
 }
 
 .users-card-header {
@@ -20,6 +21,7 @@
   background: transparent;
   color: inherit;
   margin-bottom: 10px;
+  background-color:#fafafa;
 }
 
 .users-list {
@@ -68,7 +70,11 @@
   font-size: 13px;
 }
 
+titulo{
+  font-family: 'Poppins', sans-serif ;
+  font-weight: 600;
 
+}
 .user-actions {
   display: flex;
   gap: 8px;
@@ -81,6 +87,8 @@
   padding: 5px 10px;
   border-radius: 6px;
   cursor: pointer;
+    font-family: 'Poppins', sans-serif ;
+  font-weight: 500;
 }
 
 /* ===========================
@@ -96,6 +104,8 @@
   justify-content: center;
   align-items: center;
   padding: 30px;
+    font-family: 'Poppins', sans-serif ;
+  font-weight: 500;
   z-index: 9999;
 }
 
@@ -107,8 +117,8 @@
   background: #ffffff;
   padding: 35px 40px;
   width: 100%;
-  max-width: 520px;      /* 🔥 MAIS LARGO */
-  border-radius: 18px;   /* 🔥 CANTOS MAIS BONITOS */
+  max-width: 520px;     
+  border-radius: 18px;   
   box-shadow: 0 6px 22px rgba(0,0,0,0.18);
   animation: modalIn 0.25s ease;
   position: relative;
@@ -127,9 +137,12 @@
 
 .modal-info-item {
   margin: 14px 0;
-  font-size: 18px;       /* 🔥 TEXTO MAIOR E LEGÍVEL */
+  font-size: 17px;     
   line-height: 1.5;
   color: #333;
+    font-family: 'Poppins', sans-serif ;
+  font-weight: 500;
+  text-align: start;
 }
 
 /* Botão de fechar */
@@ -177,6 +190,8 @@
   border: none;
   cursor: pointer;
   transition: 0.2s;
+    font-family: 'Poppins', sans-serif ;
+  font-weight: 600;
 }
 
 .btn-suspender {
@@ -185,6 +200,8 @@
   color: #fff;
   padding: 5px 10px;
   border-radius: 6px;
+  font-family: 'Poppins', sans-serif ;
+  font-weight: 500;
 }
 
 .btn-suspender:hover {
@@ -194,6 +211,8 @@
 .btn-ativar {
   background: #2ecc71;
   border: none;
+    font-family: 'Poppins', sans-serif ;
+  font-weight: 600;
   padding: 5px 10px;
   border-radius: 6px;
   color: #fff;

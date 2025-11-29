@@ -113,7 +113,13 @@ CREATE TABLE IF NOT EXISTS avaliacoes (
     FOREIGN KEY (id_receitas) REFERENCES receitas(id_receitas)
 );
 
-
+CREATE TABLE IF NOT EXISTS favoritos (
+    id_favorito INT AUTO_INCREMENT PRIMARY KEY,
+    id_usuario INT NOT NULL,
+    id_receita INT NOT NULL,
+    FOREIGN KEY (id_usuario) REFERENCES usuarios(id_usuarios),
+    FOREIGN KEY (id_receita) REFERENCES receitas(id_receitas)
+);
 
 -- ========================================
 -- INSERTS DE TESTE
@@ -253,10 +259,35 @@ END;
 
 DELIMITER ;
 
-select*from receitas
+select*from usuarios;
+
+select*from favoritos
+select * from receitas
+
+SELECT * FROM acessos;
+
 
 ALTER TABLE usuarios
 ADD status VARCHAR(20) DEFAULT 'ativo';
 
 ALTER TABLE usuarios
 ADD motivo_suspensao TEXT NULL;
+
+
+CREATE TABLE IF NOT EXISTS acessos (
+    id_acesso INT AUTO_INCREMENT PRIMARY KEY,
+    id_receitas INT NOT NULL,
+    data_acesso TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (id_receitas) REFERENCES receitas(id_receitas) ON DELETE CASCADE
+);
+
+
+SELECT 
+    r.id_receitas,
+    r.nome AS receita,
+    COUNT(a.id_avaliacoes) AS acessos
+FROM receitas r
+LEFT JOIN avaliacoes a ON a.id_receitas = r.id_receitas
+GROUP BY r.id_receitas
+ORDER BY acessos DESC
+LIMIT 10;

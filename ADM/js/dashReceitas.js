@@ -1,6 +1,11 @@
 // Colar este script no final do body (substitui scripts anteriores)
 document.addEventListener('DOMContentLoaded', () => {
 
+  // Instâncias globais para evitar recriação duplicada
+    window.graficoIngredientesInstancia = null;
+    window.graficoReceitasInstancia = null;
+    window.graficoUsuariosInstancia = null;
+
   // ---------- Helpers ----------
   const exists = v => v !== null && v !== undefined;
   const escapeHtml = s => String(s || '')
@@ -146,7 +151,7 @@ navItems.forEach(item => {
             </div>
           </div>
           <div style="margin-left:auto;display:flex;gap:8px">
-            <button class="btn-ver" data-id="${r.id}" title="Ver Mais">Ver Mais</button>
+            <button style="font-family: 'Poppins', sans-serif ; width:'80px';background-color:#9aa3b2;" class="btn-ver" data-id="${r.id}" title="Ver Mais">Ver Mais</button>
             <button class="btn-excluir" data-id="${r.id}" title="Excluir">Excluir</button>
           </div>
         `;
@@ -794,6 +799,9 @@ navItems.forEach(item => {
 
   async function carregarGraficos() {
     await graficoIngredientes();
+    await carregarGraficoIngredientes();
+    await carregarGraficoReceitasPorCategoria();
+    await carregarGraficoReceitasMaisAcessadas();
   }
 
   async function graficoIngredientes() {
@@ -850,6 +858,162 @@ navItems.forEach(item => {
         console.error("Erro ao gerar gráfico de ingredientes:", err);
     }
   }
+
+async function carregarGraficoIngredientes() {
+  try {
+    const res = await fetch("http://localhost:3000/api/graficos/ingredientes-populares");
+    const dados = await res.json();
+
+    const labels = dados.map(x => x.ingrediente);
+    const valores = dados.map(x => Number(x.total));
+
+    const ctx = document.getElementById("graficoIngredientes");
+
+    if (!ctx) return console.error("Canvas graficoIngredientes não encontrado!");
+
+    // 🔥 Destruir gráfico anterior
+    if (window.graficoIngredientesInstancia) {
+      window.graficoIngredientesInstancia.destroy();
+    }
+
+    window.graficoIngredientesInstancia = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels,
+        datasets: [{
+          label: "Uso dos Ingredientes",
+          data: valores,
+          backgroundColor: [
+            "#FF6384","#36A2EB","#FFCE56",
+            "#4BC0C0","#9966FF","#FF9F40",
+            "#66FF99","#C9CBCF"
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "bottom" }
+        }
+      }
+    });
+
+  } catch (err) {
+    console.error("Erro ao carregar ingredientes:", err);
+  }
+}
+
+async function carregarGraficoReceitasPorCategoria() {
+  try {
+    const res = await fetch("http://localhost:3000/api/graficos/receitas-por-categoria");
+    const dados = await res.json();
+
+    const labels = dados.map(x => `${x.categoria}`);
+    const valores = dados.map(x => Number(x.porcentagem));
+
+    const ctx = document.getElementById("graficoReceitasCategoria");
+
+    if (!ctx) return console.error("Canvas graficoReceitasCategoria não encontrado!");
+
+    // 🔥 Destruir gráfico anterior
+    if (window.graficoReceitasCategoriaInstancia) {
+      window.graficoReceitasCategoriaInstancia.destroy();
+    }
+
+    window.graficoReceitasCategoriaInstancia = new Chart(ctx, {
+      type: "doughnut",
+      data: {
+        labels,
+        datasets: [{
+          label: "Receitas por Categoria: ",
+          data: valores,
+          backgroundColor: [
+            "#FF6384", "#36A2EB", "#FFCE56",
+            "#4BC0C0", "#9966FF", "#FF9F40",
+            "#66FF99", "#C9CBCF", "#B266FF",
+            "#FF6666"
+          ]
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: "bottom" }
+        }
+      }
+    });
+
+  } catch (err) {
+    console.error("Erro ao carregar gráfico de receitas por categoria:", err);
+  }
+}
+
+async function carregarGraficoReceitasMaisAcessadas() {
+  try {
+    const res = await fetch("http://localhost:3000/api/graficos/receitas-mais-acessadas");
+    const dados = await res.json();
+
+    console.log("Dados recebidos:", dados);
+
+    const labels = dados.map(x => x.receita);
+    const valores = dados.map(x => Number(x.acessos));
+
+    const canvas = document.getElementById("graficoReceitasMaisAcessadas");
+    if (!canvas) {
+      console.error("❌ Canvas graficoReceitasMaisAcessadas NÃO encontrado!");
+      return;
+    }
+
+    const ctx = canvas.getContext("2d");
+    if (!ctx) {
+      console.error("❌ Não foi possível obter o contexto 2D do canvas!");
+      return;
+    }
+
+    // destruir instância antiga
+    if (window.graficoReceitasMaisAcessadasInstancia) {
+      window.graficoReceitasMaisAcessadasInstancia.destroy();
+    }
+
+    window.graficoReceitasMaisAcessadasInstancia = new Chart(ctx, {
+      type: "bar",
+      data: {
+        labels,
+        datasets: [{
+          label: "Acessos",
+          data: valores,
+          backgroundColor: "rgba(54, 162, 235, 0.7)",
+          borderColor: "rgba(54, 162, 235, 1)",
+          borderWidth: 2
+        }]
+      },
+      options: {
+        responsive: true,
+        indexAxis: "y",
+        scales: {
+          x: { beginAtZero: true },
+          y: {
+            ticks: {
+              callback: function(value) {
+                const label = this.getLabelForValue(value);
+                return label.length > 25 ? label.substring(0, 25) + "..." : label;
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: { display: false }
+        },
+        layout: {
+          padding: { left: 10, right: 20 }
+        }
+      }
+    });
+
+  } catch (err) {
+    console.error("❌ Erro ao carregar gráfico de receitas mais acessadas:", err);
+  }
+}
 
 
   // ---------- Expose some functions to global if needed (optional) ----------

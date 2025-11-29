@@ -141,15 +141,6 @@ async function abrirModalUsuario(id) {
     document.getElementById("modal-id").textContent = u.id_usuarios;
     document.getElementById("modal-data").textContent = u.data_cadastro;
 
-    // Alterna botões corretamente
-    if (u.status === "suspenso") {
-      document.getElementById("btn-suspender").style.display = "none";
-      document.getElementById("btn-ativar").style.display = "block";
-    } else {
-      document.getElementById("btn-suspender").style.display = "block";
-      document.getElementById("btn-ativar").style.display = "none";
-    }
-
     document.getElementById("modal-usuario").classList.remove("hidden");
 
   } catch (err) {
@@ -183,17 +174,6 @@ document.getElementById("fechar-modal-motivo").addEventListener("click", () => {
   document.getElementById("modal-motivo").classList.add("hidden");
 });
 
-// =====================
-// AÇÕES: Suspender / Ativar
-// =====================
-
-document.getElementById("btn-suspender").addEventListener("click", () => {
-  abrirModalMotivo("suspender");
-});
-
-document.getElementById("btn-ativar").addEventListener("click", () => {
-  abrirModalMotivo("ativar");
-});
 
 document.getElementById("confirmar-motivo").addEventListener("click", async () => {
   const motivo = document.getElementById("motivo-texto").value.trim();

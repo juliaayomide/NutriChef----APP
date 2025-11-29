@@ -1,0 +1,191 @@
+/* ============================
+    LAYOUT FIXO DA SIDEBAR
+=============================== */
+
+.app {
+  display: flex;
+  min-height: 100vh;
+  width: 100%;
+  overflow-x: hidden;
+}
+
+.sidebar {
+  width: 260px;                 /* largura padrão */
+  min-width: 260px;             /* impede encolher */
+  background: var(--card);
+  flex-shrink: 0;               /* impede sumir! */
+  border-right: 1px solid #ddd;
+}
+
+.main {
+  flex: 1;
+  min-width: 0;                /* permite texto quebrar */
+  padding: 20px;
+  overflow-x: hidden;
+}
+
+
+/* Grids internas */
+#screen-dashboard .grid {
+  display: grid;
+  grid-template-columns: 1fr 350px;
+  gap: 25px;
+}
+
+/* Cards */
+.card {
+  border-radius: 12px;
+}
+
+
+/* ---------------------------------------------------
+CELULARES (até 768px)
+--------------------------------------------------- */
+@media (max-width: 768px) {
+
+  /* Layout vira coluna */
+  .app {
+    flex-direction: column;
+  }
+
+  /* Sidebar vira topo */
+  .sidebar {
+    width: 100%;
+    min-height: auto;
+    display: flex;
+    flex-direction: row;
+    justify-content: center;
+    padding: 10px 0;
+    border-bottom: 1px solid #ddd;
+  }
+
+  /* Menu lateral vira horizontal */
+  .sidebar nav {
+    display: flex;
+    gap: 20px;
+  }
+
+  .sidebar .nav-item {
+    padding: 10px;
+    font-size: 14px;
+  }
+
+  /* Main ocupa tudo */
+  .main {
+    padding: 10px;
+  }
+
+  /* Topbar compactada */
+  .topbar {
+    flex-direction: column;
+    gap: 10px;
+    padding: 15px;
+  }
+
+  #page-title {
+    font-size: 22px;
+  }
+
+  /* GRID vira 1 coluna */
+  #screen-dashboard .grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Cards ocupam 100% */
+  .users-card,
+  .stats,
+  aside {
+    width: 100%;
+  }
+
+  /* Lista de usuários scrollável */
+  .users-list {
+    max-height: 350px;
+    overflow-y: auto;
+  }
+
+  /* Inputs */
+  input, textarea {
+    width: 100% !important;
+  }
+
+  /* Gráficos */
+  canvas {
+    max-width: 100% !important;
+    height: auto !important;
+  }
+
+  /* Modal responsivo */
+  .modal-content,
+  .modal-usuario .modal-content {
+    width: 90%;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+}
+
+
+/* ---------------------------------------------------
+TELAS MÉDIAS (tablets 768px - 1100px)
+--------------------------------------------------- */
+@media (max-width: 1100px) {
+
+  /* Diminuir sidebar */
+  .sidebar {
+    width: 180px;
+  }
+
+  .sidebar .nav-item {
+    font-size: 15px;
+  }
+
+  /* Ajustar grid */
+  #screen-dashboard .grid {
+    grid-template-columns: 1fr 280px;
+  }
+
+  /* Ajustar tamanho de cards */
+  .users-card {
+    font-size: 14px;
+  }
+}
+
+
+/* ---------------------------------------------------
+TELAS MUITO PEQUENAS (menos de 480px)
+--------------------------------------------------- */
+@media (max-width: 480px) {
+
+  /* Sidebar minimalista */
+  .sidebar {
+    flex-direction: column;
+    align-items: center;
+    padding: 8px;
+  }
+
+  .sidebar nav {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sidebar .nav-item {
+    font-size: 13px;
+  }
+
+  /* Título menor */
+  #page-title {
+    font-size: 18px;
+  }
+
+  /* Botões e campos maiores */
+  button,
+  input {
+    font-size: 14px !important;
+    padding: 10px !important;
+  }
+
+  /* Modal 100% da tela */
+  .modal-content {
+    width: 95%;
+  }
+}

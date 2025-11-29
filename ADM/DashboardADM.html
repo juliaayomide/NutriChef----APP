@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="./css/dashUsuario.css">
   <link rel="stylesheet" href="./css/dashReceitas.css">
   <link rel="stylesheet" href="./css/dashAvaliacoes.css">
+  <link rel="stylesheet" href="./css/responsividade.css">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
@@ -93,7 +94,7 @@
                 <div class="meta-muted" id="users-count-inline">0</div>
               </div>
 
-              <input id="user-search" class="user-search" style="border: solid 1px #000;" placeholder="Pesquisar usuários por nome..." />
+              <input id="user-search" class="user-search" style="background-color: '#fafafa';font-family: 'poppins', sans-serif;" placeholder="Pesquisar usuários por nome..." />
 
               <div id="users-container">
                 <div id="users-list" class="users-list"></div>
@@ -145,12 +146,21 @@
         <h3>Gráficos Gerais</h3>
 
         <div class="card" style="padding:20px; margin-bottom:20px;">
-            <h4>Ingredientes mais usados (%)</h4>
+            <h4>Ingredientes mais usados</h4>
             <canvas id="graficoIngredientes" width="400" height="250"></canvas>
         </div>
 
         <div id="lista-legenda-ingredientes" class="legenda-lista"></div>
 
+        <div class="card" style="padding:20px; margin-bottom:20px;">
+            <h4>Receitas por Categoria (%)</h4>
+            <canvas id="graficoReceitasCategoria" width="400" height="250"></canvas>
+        </div>
+
+        <div class="card" style="padding:20px; margin-bottom:20px;">
+            <h4>Receitas mais Acessadas</h4>
+            <canvas id="graficoReceitasMaisAcessadas" width="400" height="250"></canvas>
+        </div>
     </section>
 
       <!-- Modal de Receitas -->
@@ -166,7 +176,7 @@
           
           <button class="close-btn" id="fechar-modal-usuario">×</button>
 
-          <h2>Informações do Usuário</h2>
+          <h2 style="font-family: 'poppins', sans-serif;">Informações do Usuário</h2>
 
           <div class="modal-info-item"><strong>Nome:</strong> <span id="modal-nome"></span></div>
           <div class="modal-info-item"><strong>Email:</strong> <span id="modal-email"></span></div>
@@ -184,11 +194,11 @@
         <div class="modal-content">
           <button class="close-btn" id="fechar-modal-motivo">×</button>
 
-          <h2>Motivo</h2>
+          <h2 style="font-family: 'poppins', sans-serif;"> Motivo</h2>
 
           <textarea id="motivo-texto"
             placeholder="Descreva o motivo..."
-            style="width: 100%; height: 120px; padding: 10px; resize: none; font-size: 16px;">
+            style="width: 100%; height: 120px; padding: 10px; resize: none; font-size: 16px;font-family: 'poppins', sans-serif;border:solid;border-width: 2px;border-radius: 8px;">
           </textarea>
 
           <button id="confirmar-motivo" class="btn ativar" style="margin-top: 20px;">Confirmar</button>
@@ -204,7 +214,7 @@
           <p>Informe o termo para buscar receitas automaticamente na RPA:</p>
 
           <input id="rpa-termo"
-                placeholder="Ex: frango, bolo de chocolate, salada…"
+                placeholder="Ex: frango, massa, salada…"
                 style="width:100%; padding:10px; font-size:16px; margin-top:10px; border-radius:6px; border:1px solid #ccc;" />
 
           <button id="btn-executar-rpa"
@@ -228,7 +238,6 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
-
 function atualizarProgresso(valor) {
   const circle = document.querySelector(".progress-circle");
   const number = document.getElementById("progress-number");
@@ -236,8 +245,6 @@ function atualizarProgresso(valor) {
   circle.style.background = `conic-gradient(#ff7f00 ${valor}%, #ddd ${valor}%)`;
   number.textContent = `${valor}%`;
 }
-
-
 
 const modalRpa = document.getElementById("modal-rpa");
 const btnRpa = document.getElementById("btn-rpa");
@@ -255,7 +262,7 @@ fecharRpa.addEventListener("click", () => {
   modalRpa.classList.add("hidden");
 });
 
-// enviar termo para backend que chama o script Python
+// executar RPA
 btnExecutarRpa.addEventListener("click", async () => {
   const termo = inputTermo.value.trim();
 
@@ -264,23 +271,23 @@ btnExecutarRpa.addEventListener("click", async () => {
     return;
   }
 
-  // esconder formulário e mostrar loader
+  const loader = document.getElementById("loader-progress");
+
+  // esconder campos e mostrar loader
   btnExecutarRpa.style.display = "none";
   inputTermo.style.display = "none";
-  const loader = document.getElementById("loader-progress");
   loader.style.display = "flex";
 
   const fases = [
-    { pct: 5,   msg: "Enviando termo para a RPA..." },
-    { pct: 25,  msg: "Abrindo navegador virtual..." },
-    { pct: 45,  msg: `Buscando receitas para '${termo}'...` },
-    { pct: 65,  msg: "Processando dados coletados..." },
-    { pct: 85,  msg: "Validando receitas..." },
+    { pct: 10, msg: "Enviando termo para a RPA..." },
+    { pct: 35, msg: "Abrindo navegador virtual..." },
+    { pct: 55, msg: `Buscando receitas para '${termo}'...` },
+    { pct: 75, msg: "Processando dados coletados..." },
+    { pct: 90, msg: "Salvando no banco de dados..." },
   ];
 
   let idx = 0;
-
-  function avancarFase() {
+  function avancar() {
     if (idx < fases.length) {
       atualizarProgresso(fases[idx].pct);
       document.getElementById("progress-text").innerText = fases[idx].msg;
@@ -288,8 +295,7 @@ btnExecutarRpa.addEventListener("click", async () => {
     }
   }
 
-  // executa fases em intervalos automáticos
-  const faseInterval = setInterval(avancarFase, 900);
+  const faseTimer = setInterval(avancar, 900);
 
   try {
     const response = await fetch("http://localhost:3000/api/rpa", {
@@ -300,11 +306,10 @@ btnExecutarRpa.addEventListener("click", async () => {
 
     const data = await response.json();
 
-    clearInterval(faseInterval);
+    clearInterval(faseTimer);
 
-    // Mostrar fase final (100%)
     atualizarProgresso(100);
-    document.getElementById("progress-text").innerText = "Salvando no banco de dados...";
+    document.getElementById("progress-text").innerText = "Concluído!";
 
     setTimeout(() => {
       loader.style.display = "none";
@@ -316,14 +321,15 @@ btnExecutarRpa.addEventListener("click", async () => {
       btnExecutarRpa.disabled = false;
 
       if (data.success) {
-        alert("Coleta concluída! Receitas adicionadas.");
+        alert(`Coleta concluída! ${data.totalReceitas} receitas coletadas.`);
+        if (typeof carregarReceitas === "function") carregarReceitas();
       } else {
-        alert("Erro: " + (data.error || "Falha ao executar RPA"));
+        alert("Erro ao executar coleta.");
       }
-    }, 800);
+    }, 600);
 
   } catch (err) {
-    clearInterval(faseInterval);
+    clearInterval(faseTimer);
 
     alert("Erro ao conectar com o servidor.");
 
@@ -332,66 +338,6 @@ btnExecutarRpa.addEventListener("click", async () => {
     inputTermo.style.display = "block";
   }
 });
-
-
-btnExecutarRpa.addEventListener("click", async () => {
-  const termo = inputTermo.value.trim();
-
-  if (!termo) {
-    alert("Digite um termo!");
-    return;
-  }
-
-  // esconder formulário e mostrar loader
-  btnExecutarRpa.style.display = "none";
-  inputTermo.style.display = "none";
-  document.getElementById("loader-progress").style.display = "flex";
-
-  let progresso = 0;
-  const interval = setInterval(() => {
-    progresso = Math.min(progresso + 5, 95);
-    atualizarProgresso(progresso);
-  }, 300);
-
-  try {
-    const response = await fetch("http://localhost:3000/api/rpa", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ termo })
-    });
-
-    clearInterval(interval);
-    atualizarProgresso(100);
-
-    const data = await response.json();
-
-    setTimeout(() => {
-      document.getElementById("loader-progress").style.display = "none";
-      btnExecutarRpa.style.display = "block";
-      inputTermo.style.display = "block";
-      modalRpa.classList.add("hidden");
-
-      btnExecutarRpa.innerText = "Executar coleta";
-      btnExecutarRpa.disabled = false;
-
-      if (data.success) {
-        alert("Coleta concluída! Receitas adicionadas.");
-      } else {
-        alert("Erro: " + (data.error || "Falha ao executar RPA"));
-      }
-    }, 500);
-
-  } catch (err) {
-    clearInterval(interval);
-
-    alert("Erro ao conectar com o servidor.");
-
-    document.getElementById("loader-progress").style.display = "none";
-    btnExecutarRpa.style.display = "block";
-    inputTermo.style.display = "block";
-  }
-});
-
 
 
 async function carregarUsuarios() {

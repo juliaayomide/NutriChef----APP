@@ -1,184 +1,284 @@
-<!-- Tela LOGIN -->
-<div id="login-screen" class="screen">
-  <button class="back-button" onclick="voltarParaWelcome()">←</button>
-  <h1 style="color: #FF6300;margin-bottom: 20px;">Entrar como Administrador</h1>
-  
-  <form id="login-form">
-      <div class="form-group">
-          <input type="text" id="login-nome" placeholder="Nome" required>
-          <div class="error-message" id="login-nome-error"></div>
-      </div>
+<title>Login - ADM</title>
 
-      <div class="form-group">
-          <input type="password" id="login-password" placeholder="Senha" required>
-          <div class="error-message" id="login-password-error"></div>
-      </div>
+<div id="login-container">
+    
+    <!-- LADO ESQUERDO (imagem / logo) -->
+    <div class="login-image-side">
+        <img src="logo.png" alt="NutriChef Logo" class="login-logo">
+        <h2>NutriChef Admin</h2>
+        <p>Para quem quer refeições saudáveis sem abrir mão do sabor.</p>
+    </div>
 
-      <button type="submit" class="button-login" style="margin-bottom: 10px;">Entrar</button>
-  </form>
-  
-  <div class="msg" id="login-msg"></div>
+    <!-- LADO DIREITO (formulário) -->
+    <div id="login-screen" class="screen">
+        <h1>Entrar como Administrador</h1>
+        
+        <form id="login-form">
+            <div class="form-group">
+                <input type="text" id="login-nome" placeholder="Nome" required>
+                <div class="error-message" id="login-nome-error"></div>
+            </div>
+
+            <div class="form-group">
+                <input type="password" id="login-password" placeholder="Senha" required>
+                <div class="error-message" id="login-password-error"></div>
+            </div>
+
+            <button type="submit" class="button-login">Entrar</button>
+        </form>
+
+        <div class="msg" id="login-msg"></div>
+    </div>
+
 </div>
-</div>
+
 
 <script src="script.js"></script>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
-
 <style>
+/* ===== Fonte ===== */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
-@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-  /* ==== Estilo geral ==== */
+:root{
+  --orange-600: #FF6300;
+  --orange-700: #FF4E00;
+  --bg-white: #ffffff;
+  --input-bg: #FAFAFA;
+  --muted: #666666;
+  --card-shadow: 0 8px 30px rgba(13,13,13,0.12);
+  --glass-border: rgba(0,0,0,0.05);
+  --radius-lg: 20px;
+}
+
+/* ===== Reset / Base ===== */
+*{box-sizing:border-box}
+html,body{height:100%}
 body {
-font-family: "Poppins", sans-serif;
-color: #ffffff;
-display: flex;
-justify-content: center;
-align-items: center;
-height: 100vh;
-margin: 0;
+  margin: 0;
+  min-height: 100vh;
+  font-family: "Poppins", sans-serif;
+  background: #f5f6f8;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #222;
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+  padding: 30px;
 }
 
-/* ==== Container principal ==== */
+/* ===== Wrapper (centraliza e limita largura) ===== */
+#login-wrapper{
+  width: 100%;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* ===== Container principal dividido ===== */
+#login-container {
+  display: flex;
+  width: 100%;
+  height: 520px;
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--card-shadow);
+  align-items: stretch;
+}
+
+/* ===== LADO ESQUERDO: imagem / branding ===== */
+.login-image-side {
+  flex: 1 1 50%;
+  min-width: 320px;
+  background: linear-gradient(150deg, var(--orange-600) 0%, var(--orange-700) 100%);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 36px 28px;
+  color: #fff;
+  text-align: center;
+}
+
+.login-image-side .login-logo{
+  width: 170px;
+  max-width: 45%;
+  height: auto;
+  display: block;
+  margin-bottom: 18px;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.12));
+}
+
+.login-image-side h2 {
+  margin: 6px 0 8px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: -0.2px;
+}
+
+.login-image-side p {
+  margin: 0;
+  font-size: 14px;
+  opacity: 0.95;
+  max-width: 260px;
+}
+
+/* ===== LADO DIREITO: form ===== */
 #login-screen {
-background: #ffffff;
-border-radius: 15px;
-box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-width: 450px;
-padding: 40px 30px;
-text-align: center;
-position: relative;
-animation: fadeIn 0.6s ease;
+  flex: 1 1 50%;
+  padding: 48px 44px;
+  background: var(--bg-white);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;   /* centraliza verticalmente */
+  align-items: stretch;
+  position: relative;
 }
 
-/* ==== Botão de voltar ==== */
-.back-button {
-position: absolute;
-left: 20px;
-top: 20px;
-background: none;
-border: none;
-color: #FF6300;
-font-size: 22px;
-cursor: pointer;
-transition: 0.2s;
+/* botão voltar (posicionado dentro do card) */
+#login-screen .back-button {
+  position: absolute;
+  left: 18px;
+  top: 18px;
+  border: none;
+  background: transparent;
+  color: var(--orange-600);
+  font-size: 22px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 6px;
+  transition: transform .15s ease;
 }
-.back-button:hover {
-color: #FF6300;
+#login-screen .back-button:hover{ transform: translateX(-4px) }
+
+/* título principal */
+#login-screen h1{
+  margin: 0 0 8px 0;
+  font-size: 22px;
+  color: var(--orange-600);
+  font-weight: 700;
+  text-align: left;
 }
 
-/* ==== Título e subtítulo ==== */
-#login-screen h1 {
-font-size: 1.5em;
-margin-bottom: 5px;
-color: #FF6300;
-}
-#login-screen p {
-font-size: 0.95em;
-color: #000000;
-margin-bottom: 25px;
-font-weight: 500;
+/* subtítulo / instrução (opcional) */
+#login-screen .subtitle {
+  font-size: 13px;
+  margin-bottom: 20px;
+  color: var(--muted);
+  text-align: left;
 }
 
-/* ==== Formulário ==== */
+/* formulário - centralizado no lado direito com largura limitada */
+.form-wrap{
+  width: 100%;
+  max-width: 360px;
+  margin: 0 auto;
+}
+
+/* grupos e inputs */
 .form-group {
-margin-bottom: 20px;
-position: relative;
+  margin-bottom: 16px;
+  position: relative;
 }
+
 input[type="text"],
-input[type="password"] {
-width: 100%;
-padding: 12px 15px;
-border: none;
-font-family: "Poppins", sans-serif;
-font-weight: 500;
-border-radius: 8px;
-background: #F6F6F6;
-color: #000000;
-font-size: 15px;
-outline: none;
-transition: 0.3s;
-}
-input:focus {
-background: #F6F6F6;
-box-shadow: 0 0 0 2px #FF6300;
-}
-.error-message {
-font-size: 13px;
-color: #FF6300;
-margin-top: 5px;
+input[type="password"]{
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid var(--glass-border);
+  background: var(--input-bg);
+  font-size: 15px;
+  color: #222;
+  font-family: "Poppins", sans-serif;
+  outline: none;
+  transition: box-shadow .18s ease, border-color .18s ease, transform .12s ease;
 }
 
-/* ==== Mostrar senha ==== */
-.toggle-password {
-position: absolute;
-right: 15px;
-top: 50%;
-transform: translateY(-50%);
-color: #999;
-cursor: pointer;
-transition: 0.2s;
-}
-.toggle-password:hover {
-color: #FF6300;
+input[type="text"]::placeholder,
+input[type="password"]::placeholder{
+  color: #bdbdbd;
 }
 
-/* ==== Link Esqueci senha ==== */
-.forgot-password {
-display: block;
-text-align: right;
-margin: 10px 0 20px;
-color: #FF6300;
-text-decoration: none;
-font-size: 0.9em;
-}
-.forgot-password:hover {
-text-decoration: underline;
+/* foco */
+input[type="text"]:focus,
+input[type="password"]:focus{
+  box-shadow: 0 6px 20px rgba(255, 99, 0, 0.12);
+  border-color: var(--orange-600);
+  transform: translateY(-1px);
 }
 
-/* ==== Botão Entrar ==== */
-.button-login {
-width: 100%;
-padding: 12px;
-background: #FF6300;
-color: #fff;
-border: none;
-border-radius: 8px;
-font-size: 1em;
-font-weight: bold;
-font-family: "Poppins", sans-serif;
-cursor: pointer;
-transition: 0.3s;
-}
-.button-login:hover {
-background: #FF6300;
-transform: scale(1.03);
+/* mensagem de erro */
+.error-message{
+  color: var(--orange-600);
+  font-size: 13px;
+  margin-top: 6px;
 }
 
-/* ==== Mensagem abaixo ==== */
-#login-msg {
-margin-top: 15px;
-font-weight: 500;
+/* botão entrar */
+.button-login{
+  display: inline-block;
+  width: 100%;
+  padding: 13px 18px;
+  border-radius: 12px;
+  border: none;
+  background: linear-gradient(90deg, var(--orange-600), var(--orange-700));
+  color: #fff;
+  font-weight: 600;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: "Poppins", sans-serif;
+  box-shadow: 0 8px 20px rgba(255,99,0,0.14);
+  transition: transform .12s ease, box-shadow .12s ease;
 }
 
-/* ==== Animação suave ==== */
-@keyframes fadeIn {
-from {
-  opacity: 0;
-  transform: translateY(-15px);
-}
-to {
-  opacity: 1;
-  transform: translateY(0);
-}
+.button-login:hover{
+  transform: translateY(-3px);
+  box-shadow: 0 12px 26px rgba(255,99,0,0.18);
 }
 
-/* ==== Responsividade ==== */
-@media (max-width: 400px) {
-#login-screen {
-  width: 90%;
-  padding: 30px 20px;
-}
+/* mensagem inferior */
+#login-msg{
+  margin-top: 12px;
+  font-size: 14px;
+  color: var(--muted);
+  text-align: center;
 }
 
+/* footer dentro do card (opcional) */
+.login-footer{
+  margin-top: 18px;
+  text-align: center;
+  font-size: 12px;
+  color: #979797;
+}
+
+/* ===== Pequenos ajustes visuais ===== */
+#login-container::-webkit-scrollbar{ display:none }
+
+/* ===== RESPONSIVO ===== */
+@media (max-width: 960px){
+  #login-container{
+    height: auto;
+    flex-direction: column;
+  }
+  .login-image-side{
+    width: 100%;
+    height: 220px;
+    padding: 28px;
+  }
+  #login-screen{
+    width: 100%;
+    padding: 28px;
+  }
+  .form-wrap{ max-width: 100%; }
+}
+
+@media (max-width: 420px){
+  body{ padding: 18px }
+  .login-image-side h2{ font-size: 20px }
+  #login-screen h1{ font-size: 20px }
+  .login-image-side .login-logo{ width: 140px; }
+}
 </style>

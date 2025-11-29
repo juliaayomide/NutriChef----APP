@@ -20,6 +20,10 @@ app.use(cors({
 app.use(express.json());
 app.use(express.static(path.join(__dirname)));
 
+app.use(
+  "/usuarios",
+  express.static(path.join(__dirname, "../API/public/usuarios"))
+);
 // === CONFIGURAÇÃO DE SESSÃO ===
 app.use(session({
   secret: 'segredo_supersecreto', 
@@ -52,31 +56,67 @@ app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'cadastro.h
 
 // ---- ENDPOINT PARA EXECUTAR A RPA ----
 app.post("/api/rpa", (req, res) => {
-    const termo = req.body.termo;
+  const termo = req.body.termo;
 
-    if (!termo || termo.trim() === "") {
-        return res.status(400).json({ error: "Termo inválido" });
+  if (!termo || termo.trim() === "") {
+    return res.status(400).json({ error: "Termo inválido" });
+  }
+
+  const scriptPath = path.resolve("../RPA/rpa/buscarReceitas.py");
+  console.log("➡ Executando RPA com termo:", termo);
+
+  const { spawn } = require("child_process");
+  const processo = spawn("python", [scriptPath, termo], { windowsHide: true });
+
+  let stdoutData = "";
+  let stderrData = "";
+  let responded = false;
+
+  processo.stdout.on("data", (data) => {
+    const texto = data.toString();
+    stdoutData += texto;
+    console.log("[PYTHON STDOUT]", texto.trim());
+  });
+
+  processo.stderr.on("data", (data) => {
+    const texto = data.toString();
+    stderrData += texto;
+    console.log("[PYTHON STDERR]", texto.trim());
+  });
+
+  processo.on("error", (err) => {
+    console.error("Erro ao iniciar processo Python:", err);
+    if (!responded) {
+      responded = true;
+      return res.status(500).json({ success: false, error: "Falha ao iniciar processo Python" });
+    }
+  });
+
+  processo.on("close", (code) => {
+    console.log("✔ RPA finalizou. exit code:", code);
+
+    // tenta extrair TOTAL_SALVAS
+    const match = stdoutData.match(/TOTAL_SALVAS=(\d+)/);
+    let totalReceitas = 0;
+    if (match) {
+      totalReceitas = Number(match[1]);
     }
 
-    // Caminho absoluto até o arquivo buscarReceitas.py
-    const scriptPath = path.resolve("../RPA/rpa/buscarReceitas.py");
+    // Se não achou e o processo saiu com código != 0, reportar erro
+    if (!match && code !== 0) {
+      console.warn("Python terminou com erro e não retornou TOTAL_SALVAS.");
+      if (!responded) {
+        responded = true;
+        return res.status(500).json({ success: false, error: "RPA finalizou com erro", details: stderrData || stdoutData });
+      }
+    }
 
-    // Comando para executar
-    const comando = `python "${scriptPath}" "${termo}"`;
-
-    console.log("Executando:", comando);
-
-    exec(comando, (error, stdout, stderr) => {
-        if (error) {
-            console.error("Erro ao executar RPA:", stderr);
-            return res.status(500).json({ error: stderr });
-        }
-
-        console.log("RPA output:", stdout);
-        res.json({ success: true, log: stdout });
-    });
+    if (!responded) {
+      responded = true;
+      return res.json({ success: Boolean(match), totalReceitas });
+    }
+  });
 });
-
 
 // ==============================
 // 🔐 AUTENTICAÇÃO E SESSÃO
@@ -290,6 +330,80 @@ app.get("/api/graficos/ingredientes-populares", async (req, res) => {
   }
 });
 
+// ==============================
+// 📊 INGREDIENTES MAIS USADOS
+// ==============================
+app.get("/api/ingredientesMaisUsados", async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT i.nome AS nomeIngrediente, COUNT(*) AS total
+      FROM receita_ingredientes ri
+      JOIN ingredientes i ON i.id_ingrediente = ri.id_ingrediente
+      GROUP BY i.nome
+      ORDER BY total DESC;
+    `);
+
+    // Se tiver menos que 10, retorna tudo
+    if (rows.length <= 10) return res.json(rows);
+
+    const top10 = rows.slice(0, 10);
+    const outrosTotal = rows.slice(10).reduce((acc, item) => acc + item.total, 0);
+
+    return res.json([
+      ...top10,
+      { nomeIngrediente: "Outros", total: outrosTotal }
+    ]);
+
+  } catch (err) {
+    console.error("❌ Erro ao obter ingredientes mais usados:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+// ==============================================
+// 📊 RECEITAS POR CATEGORIA (%)
+// ==============================================
+app.get("/api/graficos/receitas-por-categoria", async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+        c.nome AS categoria,
+        COUNT(r.id_receitas) AS total,
+        ROUND((COUNT(r.id_receitas) / (SELECT COUNT(*) FROM receitas) * 100), 2) AS porcentagem
+      FROM categorias c
+      LEFT JOIN receitas r ON r.id_categoria = c.id_categorias
+      GROUP BY c.id_categorias
+      ORDER BY total DESC;
+    `);
+
+    res.json(rows);
+
+  } catch (err) {
+    console.error("Erro ao obter receitas por categoria:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+app.get("/api/graficos/receitas-mais-acessadas", async (req, res) => {
+  try {
+    const [rows] = await db.query(`
+      SELECT 
+          r.nome AS receita,
+          COUNT(a.id_acesso) AS acessos
+      FROM receitas r
+      LEFT JOIN acessos a ON a.id_receitas = r.id_receitas
+      GROUP BY r.id_receitas
+      ORDER BY acessos DESC
+      LIMIT 10;
+    `);
+
+    res.json(rows);
+
+  } catch (err) {
+    console.error("❌ Erro ao obter receitas mais acessadas:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 // ==============================
 // 👨‍💼 ROTAS DE ADMINISTRADORES
