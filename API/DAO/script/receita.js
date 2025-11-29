@@ -1,4 +1,3 @@
-import Fuse from "fuse.js";
 import { conexao } from "../conexao.js";
 
 // ===============================
@@ -139,6 +138,12 @@ export async function buscarReceitasPorCategoria(nomeCategoria) {
 export async function buscarReceitaPorId(id) {
   const conn = await conexao();
   try {
+    
+    await conn.execute(
+      "INSERT INTO acessos (id_receitas) VALUES (?)",
+      [id]
+    );
+
     const [receitas] = await conn.execute(
       "SELECT * FROM receitas WHERE id_receitas = ?",
       [id]

@@ -1,5 +1,5 @@
 import express from 'express';
-import pool from '../database.js';
+import { conexao } from '../DAO/conexao.js';
 
 const router = express.Router();
 
@@ -8,9 +8,10 @@ const router = express.Router();
 // ============================================
 router.get('/:id_usuario', async (req, res) => {
     const { id_usuario } = req.params;
-
+    const conn = await conexao();
+    
     try {
-        const [rows] = await pool.query(
+        const [rows] = await conn.query(
             `SELECT f.id_favorito, r.*
              FROM favoritos f
              INNER JOIN receitas r ON r.id_receitas = f.id_receita
@@ -30,13 +31,14 @@ router.get('/:id_usuario', async (req, res) => {
 // ============================================
 router.post('/add', async (req, res) => {
     const { id_usuario, id_receita } = req.body;
+    const conn = await conexao();
 
     if (!id_usuario || !id_receita) {
         return res.status(400).json({ message: 'Dados incompletos.' });
     }
 
     try {
-        const [result] = await pool.query(
+        const [result] = await conn.query(
             `INSERT INTO favoritos (id_usuario, id_receita)
              VALUES (?, ?)`,
             [id_usuario, id_receita]
@@ -54,9 +56,10 @@ router.post('/add', async (req, res) => {
 // ============================================
 router.delete('/remove/:id_usuario/:id_receita', async (req, res) => {
     const { id_usuario, id_receita } = req.params;
+    const conn = await conexao();
 
     try {
-        await pool.query(
+        await conn.query(
             `DELETE FROM favoritos WHERE id_usuario = ? AND id_receita = ?`,
             [id_usuario, id_receita]
         );

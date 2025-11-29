@@ -5,10 +5,6 @@ import {
   buscarReceitaPorId,
   buscarReceitas,
   buscarReceitasPorCategoria,
-  incluirReceita,
-  inserirIngredientes,
-  inserirPassos,
-  inserirUtensilios,
   buscarCategoriasForm,
   buscarIngredientesForm,
 } from "../DAO/script/receita.js";
@@ -44,10 +40,14 @@ router.get("/receitas", async (req, res) => {
 router.get("/receitaDet/:id", async (req, res) => {
   try {
     const receita = await buscarReceitaPorId(req.params.id);
-    if (!receita) return res.status(404).json({ message: "Receita não encontrada" });
+
+    if (!receita)
+      return res.status(404).json({ message: "Receita não encontrada" });
+
     res.json(receita);
+
   } catch (err) {
-    console.error(err);
+    console.error("❌ Erro ao carregar receita:", err);
     res.status(500).json({ message: "Erro ao carregar receita" });
   }
 });
