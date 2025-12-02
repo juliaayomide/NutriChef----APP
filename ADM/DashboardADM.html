@@ -15,27 +15,38 @@
 </head>
 <body>
 <div class="app">
-  <aside class="sidebar card">
-    
+  <aside class="sidebar card" id="sidebar">
+    <button id="toggle-sidebar" class="toggle-sidebar">☰</button>
     <nav>
-      <a class="nav-item active" href="#" data-screen="dashboard">Dashboard</a>
-      <a class="nav-item" href="#" data-screen="receitas">Receitas</a>
-      <!-- <a class="nav-item" href="#" data-screen="denuncias">Avaliações</a> -->
-      <a class="nav-item" href="#"data-screen="graficos">Gráficos</a>
+        <a class="nav-item active" href="#" data-screen="dashboard">
+            <span class="icon">🏠</span>
+            <span class="label">Dashboard</span>
+        </a>
+
+        <a class="nav-item" href="#" data-screen="receitas">
+            <span class="icon">🍳</span>
+            <span class="label">Receitas</span>
+        </a>
+
+        <a class="nav-item" href="#" data-screen="graficos">
+            <span class="icon">📊</span>
+            <span class="label">Gráficos</span>
+        </a>
     </nav>
-  
   </aside>
+
 
   <main class="main">
     <div id="admin-fixed-name">
       <div id="admin-info" style="color:var(--muted);font-size:13px"></div>
-      <!-- <div class="avatar"></div> -->
+     
     </div>
 
     <div class="card topbar">
       <div class="top-left">
         <div class="title" id="page-title">Visão Geral</div>
         <div class="logo"><img src="logo.png" alt="logo"></div>
+        
         <div class="search" style="display: none;">
           <input placeholder="Pesquisar..." id="global-search">
         </div>
@@ -110,7 +121,7 @@
         <h3>Receitas Cadastradas</h3>
 
         <div class="receitas-top">
-          <input type="text" id="search-receita" style="border: solid 3px #000;" placeholder="Pesquisar receita..." />
+          <input type="text" id="search-receita"  placeholder="Pesquisar receita..." />
         </div>
 
         <ul id="receitas-lista" class="receitas-lista"></ul>
@@ -182,11 +193,6 @@
           <div class="modal-info-item"><strong>Email:</strong> <span id="modal-email"></span></div>
           <div class="modal-info-item"><strong>ID:</strong> <span id="modal-id"></span></div>
           <div class="modal-info-item"><strong>Cadastrado em:</strong> <span id="modal-data"></span></div>
-          
-          <div class="modal-actions">
-            <button id="btn-suspender" class="btn suspender">Suspender Usuário</button>
-            <button id="btn-ativar" class="btn ativar">Ativar Usuário</button>
-          </div>
         </div>
       </div>
 
@@ -198,10 +204,10 @@
 
           <textarea id="motivo-texto"
             placeholder="Descreva o motivo..."
-            style="width: 100%; height: 120px; padding: 10px; resize: none; font-size: 16px;font-family: 'poppins', sans-serif;border:solid;border-width: 2px;border-radius: 8px;">
+            style="width: 100%; height: 120px; padding: 10px; resize: none; font-size: 16px;font-family: 'poppins', sans-serif;border:1px solid var(--soft-border);background:#fbfbfb;border-radius: 8px;">
           </textarea>
 
-          <button id="confirmar-motivo" class="btn ativar" style="margin-top: 20px;">Confirmar</button>
+          <button id="confirmar-motivo" class="btn ativar" style="margin-top: 20px;background-color: #000;color: #fff;">Confirmar</button>
         </div>
       </div>
 
@@ -209,16 +215,16 @@
         <div class="modal-content">
           <button class="close-btn" id="fechar-modal-rpa">×</button>
 
-          <h2>Adicionar receitas</h2>
+          <h2 style="font-family:'Poppins',sans-serif">Adicionar receitas</h2>
 
-          <p>Informe o termo para buscar receitas automaticamente na RPA:</p>
+          <p style="font-family:'Poppins',sans-serif">Informe o termo para buscar receitas automaticamente na RPA:</p>
 
           <input id="rpa-termo"
                 placeholder="Ex: frango, massa, salada…"
-                style="width:100%; padding:10px; font-size:16px; margin-top:10px; border-radius:6px; border:1px solid #ccc;" />
+                style="width:100%; padding:10px; font-size:16px; margin-top:10px; border-radius:6px; border:1px solid #ccc;font-family:'Poppins',sans-serif" />
 
           <button id="btn-executar-rpa"
-                  style="margin-top:20px; width:100%; padding:12px; background:#ff7f00; color:white; border:none; border-radius:6px; font-size:16px; font-weight:bold; cursor:pointer;">
+                  style="margin-top:20px; width:100%; padding:12px; background:#ff7f00; color:white; border:none; border-radius:6px; font-size:16px; font-weight:bold; cursor:pointer;font-family:'Poppins',sans-serif">
             Executar coleta
           </button>
 
@@ -235,9 +241,29 @@
   </main>
 </div>
 
+<div id="modal-msg" class="modal-msg hidden">
+  <div class="modal-msg-content">
+    <h3 id="modal-msg-titulo">Mensagem</h3>
+    <p id="modal-msg-texto"></p>
+    <button id="modal-msg-btn">OK</button>
+  </div>
+</div>
+
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <script>
+function showMessage(titulo, texto = "") {
+  const modal = document.getElementById("modal-msg");
+  document.getElementById("modal-msg-titulo").innerText = titulo;
+  document.getElementById("modal-msg-texto").innerText = texto;
+
+  modal.classList.remove("hidden");
+
+  document.getElementById("modal-msg-btn").onclick = () => {
+    modal.classList.add("hidden");
+  };
+}
+
 function atualizarProgresso(valor) {
   const circle = document.querySelector(".progress-circle");
   const number = document.getElementById("progress-number");
@@ -267,7 +293,7 @@ btnExecutarRpa.addEventListener("click", async () => {
   const termo = inputTermo.value.trim();
 
   if (!termo) {
-    alert("Digite um termo!");
+    showMessage("Digite um termo!");
     return;
   }
 
@@ -321,17 +347,17 @@ btnExecutarRpa.addEventListener("click", async () => {
       btnExecutarRpa.disabled = false;
 
       if (data.success) {
-        alert(`Coleta concluída! ${data.totalReceitas} receitas coletadas.`);
+        showMessage(`Coleta concluída! ${data.totalReceitas} receitas coletadas.`);
         if (typeof carregarReceitas === "function") carregarReceitas();
       } else {
-        alert("Erro ao executar coleta.");
+        showMessage("Erro ao executar coleta.");
       }
     }, 600);
 
   } catch (err) {
     clearInterval(faseTimer);
 
-    alert("Erro ao conectar com o servidor.");
+    showMessage("Erro ao conectar com o servidor.");
 
     loader.style.display = "none";
     btnExecutarRpa.style.display = "block";
@@ -422,6 +448,35 @@ async function carregarUsuarios() {
 }
 
 carregarUsuarios();
+
+const sidebar = document.getElementById("sidebar");
+const toggleBtn = document.getElementById("toggle-sidebar");
+
+// Desktop: sidebar padrão
+// Mobile: sidebar inicia compacta
+function updateSidebarMode() {
+  if (window.innerWidth <= 920) {
+    sidebar.classList.add("compact");
+  } else {
+    sidebar.classList.remove("compact");
+    sidebar.classList.remove("expanded");
+  }
+}
+
+updateSidebarMode();
+window.addEventListener("resize", updateSidebarMode);
+
+// Botão de expandir/recolher
+toggleBtn.addEventListener("click", () => {
+  if (sidebar.classList.contains("expanded")) {
+    sidebar.classList.remove("expanded");
+    sidebar.classList.add("compact");
+  } else {
+    sidebar.classList.add("expanded");
+    sidebar.classList.remove("compact");
+  }
+});
+
 </script>
 
 
