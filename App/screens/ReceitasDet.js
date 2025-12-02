@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 
 import Logo from '../components/Logo';
+import BottomNav from '../components/BottomNav';
 
 export default function ReceitaDet({ route, navigation }) {
   const { id } = route.params || { id: 1 };
@@ -112,7 +113,7 @@ export default function ReceitaDet({ route, navigation }) {
         ) : (
           <Text style={styles.noData}>Informações nutricionais não disponíveis.</Text>
         )}
-              
+          <BottomNav navigation={navigation}></BottomNav>
     </ScrollView>
   );
 }
@@ -136,7 +137,7 @@ const styles = StyleSheet.create({
   },
   closeText: {
     fontSize: 30,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     color: '#FF7F50',
   },
   recipeImage: {
@@ -150,7 +151,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 24,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     marginBottom: 5,
   },
   author: {
@@ -165,7 +166,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontFamily: 'Poppins_600SemiBold',
     marginTop: 15,
     marginBottom: 5,
   },
@@ -198,7 +199,7 @@ const styles = StyleSheet.create({
   },
   nutriTitle: {
     fontSize: 18,
-    fontWeight: '700',
+    fontFamily: 'Poppins_700Bold',
     color: '#ff4400ff',
     marginBottom: 10,
     textAlign: 'center',
@@ -217,7 +218,7 @@ const styles = StyleSheet.create({
   nutriLabel: {
     fontSize: 16,
     color: '#000000ff',
-    fontWeight: '600',
+    fontFamily: 'Poppins_600SemiBold',
   },
   nutriValue: {
     fontSize: 15,
@@ -242,5 +243,4 @@ footerText: {
   color: '#000000ff',
   fontSize: 12,
 },
-
 });

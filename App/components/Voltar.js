@@ -69,7 +69,7 @@ const styles = StyleSheet.create({
   },
   backText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     marginLeft: 5,
     fontSize: 14,
   },

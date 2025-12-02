@@ -136,7 +136,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontFamily: 'Poppins_600SemiBold',
     marginTop: 15,
     marginBottom: 10,
     color: '#333',
@@ -163,10 +163,10 @@ const styles = StyleSheet.create({
   },
   buttonText: {
     color: '#333',
-    fontWeight: '500',
+    fontFamily: 'Poppins_500Medium',
   },
   selectedText: {
     color: '#000000ff',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
   },
 });

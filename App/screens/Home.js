@@ -16,6 +16,9 @@ export default function Home({ navigation }) {
 
   const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
 
+  //Fonte
+  
+
   // Filtros gerais
   const receitasPopulares = receitas.slice(0, 10);
   const receitasDiaDia = receitas.filter(r => r.tempo_preparo <= 40);
@@ -101,7 +104,7 @@ export default function Home({ navigation }) {
           <View style={styles.sectionHeader}>
             <Text style={styles.title}>Categorias</Text>
             <TouchableOpacity onPress={() => navigation.navigate('allCategorias')}>
-              <Text style={styles.viewAll}>Ver todas</Text>
+            <Text style={styles.viewAll}>Ver todas</Text>
             </TouchableOpacity>
           </View>
 
@@ -220,7 +223,7 @@ const shadowStyle = Platform.select({
 });
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fafafa',fontFamily: 'Lexend' },
+  screen: { flex: 1, backgroundColor: '#fafafa',},
   scroll: { flex: 1, backgroundColor: '#fafafa' },
   headerContainer: {
     paddingTop: 40,
@@ -231,7 +234,6 @@ const styles = StyleSheet.create({
     borderBottomRightRadius: 30,
     ...shadowStyle,
     marginTop:-40,
-   
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 10,
@@ -248,9 +250,9 @@ const styles = StyleSheet.create({
   searchText: { color: '#d80303ff', fontSize: 15 },
   bodyContainer: { paddingHorizontal: 20, paddingTop: 10 },
   sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  title: { fontSize: 19, fontWeight: 'bold', color: '#333', marginTop: 15, marginBottom: 8, marginLeft:5 },
-  subtitle: { fontSize: 18, fontWeight: '600', color: '#444', marginTop: 20 },
-  viewAll: { color: '#FF6300', fontWeight: '500' },
+  title: { fontSize: 19, fontFamily: "Poppins_700Bold", color: '#333', marginTop: 15, marginBottom: 8, marginLeft:5 },
+  subtitle: { fontSize: 18, fontFamily: "Poppins_600SemiBold", color: '#444', marginTop: 20 },
+  viewAll: { color: '#FF6300', fontFamily: 'Poppins_500Medium' },
 
   categories: {
     flexDirection: 'row',
@@ -267,7 +269,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...shadowStyle,
   },
-  cardText: { color: '#101010ff', fontWeight: 'bold', fontSize: 16 },
+  cardText: { color: '#101010ff', fontFamily: "Poppins_700Bold", fontSize: 16 },
   recipeCard: {
     backgroundColor: '#fff',
     borderRadius: 15,
@@ -277,7 +279,7 @@ const styles = StyleSheet.create({
     ...shadowStyle,
   },
   recipeImage: { width: '100%', height: 110, borderRadius: 10 },
-  recipeTitle: { fontWeight: '600', marginTop: 8, color: '#333' },
+  recipeTitle: { fontFamily: 'Poppins_600SemiBold', marginTop: 8, color: '#333' },
   recipeTime: { color: '#777', marginTop: 3 },
 
 
@@ -300,7 +302,7 @@ const styles = StyleSheet.create({
   },
   cardText: {
     color: '#ffffffff',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     fontSize: 14,
     paddingHorizontal: 10,
     paddingVertical: 8,
@@ -375,7 +377,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     ...shadowStyle,
   },
-  cardText: { color: '#101010ff', fontWeight: 'bold', fontSize: 16 },
+  cardText: { color: '#101010ff', fontFamily: 'Poppins_700Bold', fontSize: 16 },
   recipeCard: {
     backgroundColor: '#fff',
     borderRadius: 15,
@@ -385,7 +387,7 @@ const styles = StyleSheet.create({
 
   },
   recipeImage: { width: '100%', height: 110, borderRadius: 10 },
-  recipeTitle: { fontWeight: '600', marginTop: 8, color: '#333' },
+  recipeTitle: { fontFamily: 'Poppins_600SemiBold', marginTop: 8, color: '#333' },
   recipeTime: { color: '#777', marginTop: 3 },
 
 
@@ -408,7 +410,7 @@ const styles = StyleSheet.create({
   },
   cardText: {
     color: '#ffffffff',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     fontSize: 18,
     paddingHorizontal: 10,
     paddingVertical: 5,

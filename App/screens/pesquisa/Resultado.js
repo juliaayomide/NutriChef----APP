@@ -68,8 +68,8 @@ export default function Resultados({ route, navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 15, backgroundColor: '#fdfdfd' },
-  title: { fontSize: 20, fontWeight: 'bold', marginBottom: 15 },
+  container: { flex: 1, padding: 15, backgroundColor: '#fdfdfd',},
+  title: { fontSize: 20, fontFamily: 'Poppins_700Bold', marginBottom: 15 },
   listaReceitas: { paddingBottom: 20 },
   receitaItem: {
     borderWidth: 1,
@@ -80,7 +80,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     boxShadow: '0px 2px 5px rgba(0,0,0,0.1)',
   },
-  receitaNome: { fontSize: 16, fontWeight: 'bold', marginBottom: 5 },
+  receitaNome: { fontSize: 16, fontFamily: 'Poppins_700Bold', marginBottom: 5 },
   receitaDescricao: { fontSize: 14, color: '#555', marginBottom: 10 },
   verReceitaBtn: {
     alignSelf: 'flex-start',
@@ -89,6 +89,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#FF7F50',
     borderRadius: 5,
   },
-  verReceitaText: { color: '#fff', fontWeight: 'bold' },
+  verReceitaText: { color: '#fff', fontFamily: 'Poppins_700Bold' },
   semResultados: { fontSize: 16, color: '#555', marginTop: 20, textAlign: 'center' },
 });

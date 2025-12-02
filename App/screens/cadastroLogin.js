@@ -267,10 +267,10 @@ export default function CadastroLogin({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#fff", alignItems: "center", justifyContent: "center" },
+  container: { flex: 1, backgroundColor: "#fff", alignItems: "center", justifyContent: "center", },
   screen: { width: "85%", alignItems: "center" },
-  logo: { fontSize: 30, fontWeight: "bold", color: "#FF6300", marginBottom: 10 },
-  title: { fontSize: 24, fontWeight: "bold", marginBottom: 5 },
+  logo: { fontSize: 30, fontFamily: "Poppins_700Bold", color: "#FF6300", marginBottom: 10 },
+  title: { fontSize: 24, fontFamily: "Poppins_700Bold", marginBottom: 5 },
   text: { textAlign: "center", color: "#000000ff", marginBottom: 20 },
   input: {
     width: "100%",
@@ -297,7 +297,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     marginTop: 5,
   },
-  buttonText: { color: "#fff", fontWeight: "bold" },
+  buttonText: { color: "#fff", fontFamily: "Poppins_700Bold" },
   link: { color: "#333", marginTop: 10 },
   mensagem: { marginTop: 10, fontSize: 15, textAlign: "center" },
   sucesso: { color: "green" },

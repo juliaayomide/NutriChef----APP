@@ -97,7 +97,7 @@ const styles = StyleSheet.create({
   },
   labelActive: {
     color: '#FF6300',
-    fontWeight: '600',
+    fontFamily: 'Poppins_600SemiBold',
   },
   active: {
     opacity: 0.9,

@@ -35,7 +35,7 @@ export default function AllCategorias({ navigation }) {
     return (
       <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
         <ActivityIndicator size="large" color="#E63946" />
-        <Text style={{ marginTop: 10, color: '#555', fontWeight: '500' }}>Carregando categorias...</Text>
+        <Text style={{ marginTop: 10, color: '#555', fontFamily: 'Poppins_500Medium' }}>Carregando categorias...</Text>
       </View>
     );
   }
@@ -79,13 +79,13 @@ export default function AllCategorias({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#F8FAFC' },
+  container: { flex: 1, backgroundColor: '#F8FAFC',},
   scrollContent: {
     padding: 20,
     paddingBottom: 100,
     alignItems: 'center',
   },
-  title: { fontSize: 26, marginVertical: 20, fontWeight: 'bold', color: '#222' },
+  title: { fontSize: 26, marginVertical: 20, fontFamily: 'Poppins_700Bold', color: '#222' },
   categories: {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -115,14 +115,14 @@ const styles = StyleSheet.create({
   },
   fallbackText: {
     color: '#fff',
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     fontSize: 15,
     marginTop: 5,
     textAlign: 'center',
   },
   cardTitle: {
     marginTop: 10,
-    fontWeight: 'bold',
+    fontFamily: 'Poppins_700Bold',
     fontSize: 16,
     color: '#222',
     textAlign: 'center',

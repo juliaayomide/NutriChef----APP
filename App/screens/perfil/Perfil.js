@@ -149,18 +149,18 @@ export default function Perfil() {
 }
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: "#fff", padding: 20 },
+  container: { backgroundColor: "#fff", padding: 20, },
   perfilInfo: { alignItems: "center", justifyContent: "center", marginBottom: 30, position: "relative" },
   perfilFoto: { width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: "#ff6a00", backgroundColor: "#f0f0f0" },
-  perfilNome: { fontSize: 22, fontWeight: "600", marginTop: 10 },
+  perfilNome: { fontSize: 22, fontFamily: "Poppins_600SemiBold", marginTop: 10 },
   configBtn: { position: "absolute", top: -5, right: -5 },
   configIcon: { fontSize: 28, color: "#ff6a00" },
   section: { marginBottom: 30 },
-  sectionTitle: { fontSize: 18, fontWeight: "600", marginBottom: 10 },
+  sectionTitle: { fontSize: 18, fontFamily: "Poppins_600SemiBold", marginBottom: 10 },
   receitaCard: { width: 150, backgroundColor: "#fafafa", borderRadius: 12, marginRight: 15, shadowColor: "#000", shadowOpacity: 0.1, shadowOffset: { width: 0, height: 2 }, shadowRadius: 5, elevation: 3, alignItems: "center" },
   receitaImg: { width: "100%", height: 100, borderRadius: 12 },
   receitaNome: { fontSize: 14, marginVertical: 5, textAlign: "center" },
   favorito: { color: "red", fontSize: 18 },
   buttonDanger: { width: 180, height: 60, backgroundColor: "#ff4b5c", borderRadius: 10, alignSelf: "center", justifyContent: "center", alignItems: "center", marginTop: 10 },
-  buttonDangerText: { color: "#fff", fontWeight: "bold", fontSize: 18 },
+  buttonDangerText: { color: "#fff", fontFamily: "Poppins_700Bold", fontSize: 18 },
 });

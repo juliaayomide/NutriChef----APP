@@ -180,15 +180,15 @@ export default function AlterPerfil() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
-  title: { fontSize: 20, fontWeight: "600", textAlign: "center", marginBottom: 20 },
+  container: { flex: 1, padding: 20, backgroundColor: "#fff",},
+  title: { fontSize: 20, fontFamily: "Poppins_600SemiBold", textAlign: "center", marginBottom: 20 },
   fotoContainer: { alignItems: "center", marginBottom: 30 },
   fotoPerfil: { width: 130, height: 130, borderRadius: 65, borderWidth: 3, borderColor: "#000", backgroundColor: "#f0f0f0", marginBottom: 10 },
   btnMudarFoto: { backgroundColor: "#d10000", paddingVertical: 8, paddingHorizontal: 20, borderRadius: 10 },
-  btnMudarFotoText: { color: "#fff", fontWeight: "bold" },
+  btnMudarFotoText: { color: "#fff", fontFamily: "Poppins_700Bold" },
   form: { width: "100%", maxWidth: 400 },
-  label: { fontWeight: "600", marginBottom: 5, marginTop: 10 },
+  label: { fontFamily: "Poppins_600SemiBold", marginBottom: 5, marginTop: 10 },
   input: { padding: 10, borderWidth: 1.5, borderColor: "#ccc", borderRadius: 10, fontSize: 15 },
   btnSalvar: { backgroundColor: "red", paddingVertical: 14, borderRadius: 12, marginTop: 20, alignItems: "center" },
-  btnSalvarText: { color: "#fff", fontWeight: "bold", fontSize: 16 },
+  btnSalvarText: { color: "#fff", fontFamily: "Poppins_700Bold", fontSize: 16 },
 });

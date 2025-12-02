@@ -111,7 +111,7 @@ export default function ConfigPerfil() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: "#fff" },
+  container: { flex: 1, padding: 20, backgroundColor: "#fff", },
 
   // ===== Perfil do usuário =====
   configUser: { alignItems: "center", marginBottom: 30 },
@@ -124,18 +124,18 @@ const styles = StyleSheet.create({
     backgroundColor: "#f0f0f0",
     marginBottom: 12,
   },
-  usuarioNome: { fontSize: 20, fontWeight: "600", marginBottom: 10 },
+  usuarioNome: { fontSize: 20, fontFamily: "Poppins_600SemiBold", marginBottom: 10 },
   btnEditar: {
     backgroundColor: "#ff6a00",
     paddingVertical: 10,
     paddingHorizontal: 25,
     borderRadius: 8,
   },
-  btnEditarText: { color: "#fff", fontWeight: "500", fontSize: 14 },
+  btnEditarText: { color: "#fff", fontFamily: "Poppins_500Medium", fontSize: 14 },
 
   // ===== Opções =====
   configOpcoes: { marginBottom: 30 },
-  opcoesTitle: { fontSize: 16, fontWeight: "600", marginBottom: 10 },
+  opcoesTitle: { fontSize: 16, fontFamily: "Poppins_600SemiBold", marginBottom: 10 },
   opcaoItem: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -154,5 +154,5 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     alignItems: "center",
   },
-  btnLogoutText: { color: "#fff", fontWeight: "600", fontSize: 16 },
+  btnLogoutText: { color: "#fff", fontFamily: "Poppins_600SemiBold", fontSize: 16 },
 });

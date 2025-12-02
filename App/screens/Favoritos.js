@@ -40,7 +40,7 @@ export default function Favoritos({ navigation }) {
   if (!user) return null;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff' }}>
+    <View style={{ flex: 1, backgroundColor: '#fff',}}>
       <Header navigation={navigation} />
 
       <FlatList
@@ -104,7 +104,7 @@ const styles = StyleSheet.create({
     borderTopRightRadius: 15,
   },
   recipeInfo: { padding: 10 },
-  recipeName: { fontWeight: 'bold', fontSize: 16, color: '#444' },
+  recipeName: { fontFamily: 'Poppins_700Bold', fontSize: 16, color: '#444' },
   recipeTime: { fontSize: 12, color: '#888', marginTop: 3 },
   heartBtn: { position: 'absolute', top: 10, right: 10 },
   heartText: { fontSize: 22 },

@@ -107,7 +107,7 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: 20,
-    fontWeight: "bold",
+    fontFamily: "Poppins_700Bold",
     color: "#e68900",
     marginBottom: 12,
   },
@@ -132,7 +132,7 @@ const styles = StyleSheet.create({
     height: 100,
   },
   recipeTitle: {
-    fontWeight: "600",
+    fontFamily: "Poppins_600SemiBold",
     fontSize: 14,
     marginTop: 6,
     marginHorizontal: 8,
