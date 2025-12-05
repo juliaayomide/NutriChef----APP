@@ -1,7 +1,3 @@
-// =====================
-// Card de Usuários (DashboardADM)
-// =====================
-
 let userSearchTimeout = null;
 const usersListEl = document.getElementById('users-list');
 const noUsersMsgEl = document.getElementById('no-users-msg');
@@ -28,7 +24,6 @@ async function fetchUsuarios(query = "") {
 
     let users = await res.json();
 
-    // 🔍 Filtro extra no front
     if (query.trim() !== "") {
       const nq = normalize(query);
 
@@ -38,14 +33,12 @@ async function fetchUsuarios(query = "") {
       );
     }
 
-    // Atualiza contadores
     document.getElementById("users-count-inline").textContent =
       users.length + (users.length === 1 ? " usuário" : " usuários");
 
     const totalUsuarios = document.getElementById("total-usuarios");
     if (totalUsuarios) totalUsuarios.textContent = users.length;
 
-    // Lista vazia
     if (!users || users.length === 0) {
       usersListEl.innerHTML = "";
       noUsersMsgEl.style.display = "block";
@@ -54,7 +47,6 @@ async function fetchUsuarios(query = "") {
       noUsersMsgEl.style.display = "none";
     }
 
-    // Renderização
     usersListEl.innerHTML = "";
 
     users.forEach(u => {
@@ -106,10 +98,6 @@ function abrirModalMotivoAtivar(id) {
   abrirModalMotivo("ativar");
 }
 
-// =====================
-// Busca
-// =====================
-
 userSearchInput.addEventListener('input', e => {
   const q = e.target.value.trim();
   if (userSearchTimeout) clearTimeout(userSearchTimeout);
@@ -121,17 +109,13 @@ document.getElementById('global-search').addEventListener('input', e => {
   fetchUsuarios(q);
 });
 
-// =====================
-// Modal de Usuário
-// =====================
-
 let usuarioAtual = null;
 let acaoAtual = null;
 
 async function abrirModalUsuario(id) {
   try {
     const res = await fetch(`http://localhost:3000/api/usuarios/${id}`);
-    if (!res.ok) return alert("Usuário não encontrado!");
+    if (!res.ok) return showMessage("Usuário não encontrado!");
 
     const u = await res.json();
     usuarioAtual = u;
@@ -145,11 +129,10 @@ async function abrirModalUsuario(id) {
 
   } catch (err) {
     console.error(err);
-    alert("Erro ao buscar usuário.");
+    showMessage("Erro ao buscar usuário.");
   }
 }
 
-// Fechar modal
 document.getElementById("fechar-modal-usuario").addEventListener("click", () => {
   document.getElementById("modal-usuario").classList.add("hidden");
 });
@@ -159,10 +142,6 @@ document.getElementById("modal-usuario").addEventListener("click", e => {
     document.getElementById("modal-usuario").classList.add("hidden");
   }
 });
-
-// =====================
-// MODAL MOTIVO
-// =====================
 
 function abrirModalMotivo(acao) {
   acaoAtual = acao;
@@ -177,7 +156,7 @@ document.getElementById("fechar-modal-motivo").addEventListener("click", () => {
 
 document.getElementById("confirmar-motivo").addEventListener("click", async () => {
   const motivo = document.getElementById("motivo-texto").value.trim();
-  if (motivo.length < 3) return alert("Digite um motivo válido.");
+  if (motivo.length < 3) return showMessage("Digite um motivo válido.");
 
   const endpoint =
     acaoAtual === "suspender"
@@ -191,18 +170,14 @@ document.getElementById("confirmar-motivo").addEventListener("click", async () =
   });
 
   const data = await res.json();
-  if (!data.success) return alert("Erro ao aplicar ação.");
+  if (!data.success) return showMessage("Erro ao aplicar ação.");
 
-  alert("Ação realizada com sucesso!");
+  showMessage("Ação realizada com sucesso!");
 
   document.getElementById("modal-motivo").classList.add("hidden");
   document.getElementById("modal-usuario").classList.add("hidden");
 
   fetchUsuarios();
 });
-
-// =====================
-// Inicialização
-// =====================
 
 fetchUsuarios();

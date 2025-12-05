@@ -11,9 +11,11 @@ body {
 
 
 }
-h2{
+
+h2 {
     font-size: 1.5em;
 }
+
 main {
     font-family: "Poppins", sans-serif;
     background: #fff;
@@ -67,6 +69,7 @@ border: none;
 box-shadow: 0 0 0 4px #FF6300;
 text-decoration: none;
 }
+
 
 .error {
     color: red;

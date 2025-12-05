@@ -1,6 +1,3 @@
-// ==============================
-// 📦 IMPORTAÇÕES E CONFIGURAÇÃO
-// ==============================
 const express = require('express');
 const cors = require('cors');
 const mysql = require('mysql2/promise');
@@ -11,7 +8,6 @@ const { exec } = require("child_process");
 
 const app = express();
 
-// === CONFIGURAÇÃO DE CORS (permitir cookies da sessão) ===
 app.use(cors({
   origin: 'http://localhost:5173', 
   credentials: true
@@ -24,21 +20,18 @@ app.use(
   "/usuarios",
   express.static(path.join(__dirname, "../API/public/usuarios"))
 );
-// === CONFIGURAÇÃO DE SESSÃO ===
+
 app.use(session({
-  secret: 'segredo_supersecreto', 
+  secret: 'NutriChefSecretKey', 
   resave: false,
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    secure: false, // true se usar HTTPS
+    secure: false, 
     sameSite: 'lax'
   }
 }));
 
-// ==============================
-// 💾 CONEXÃO COM O BANCO
-// ==============================
 const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
@@ -46,15 +39,11 @@ const db = mysql.createPool({
   database: 'nutrichef'
 });
 
-// ==============================
-// 🧭 ROTAS DE PÁGINAS HTML
-// ==============================
 app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'login.html')));
 app.get('/dashboard', (req, res) => res.sendFile(path.join(__dirname, 'DashboardADM.html')));
 app.get('/cadastro', (req, res) => res.sendFile(path.join(__dirname, 'cadastro.html')));
 
 
-// ---- ENDPOINT PARA EXECUTAR A RPA ----
 app.post("/api/rpa", (req, res) => {
   const termo = req.body.termo;
 
@@ -95,14 +84,12 @@ app.post("/api/rpa", (req, res) => {
   processo.on("close", (code) => {
     console.log("✔ RPA finalizou. exit code:", code);
 
-    // tenta extrair TOTAL_SALVAS
     const match = stdoutData.match(/TOTAL_SALVAS=(\d+)/);
     let totalReceitas = 0;
     if (match) {
       totalReceitas = Number(match[1]);
     }
 
-    // Se não achou e o processo saiu com código != 0, reportar erro
     if (!match && code !== 0) {
       console.warn("Python terminou com erro e não retornou TOTAL_SALVAS.");
       if (!responded) {
@@ -118,9 +105,6 @@ app.post("/api/rpa", (req, res) => {
   });
 });
 
-// ==============================
-// 🔐 AUTENTICAÇÃO E SESSÃO
-// ==============================
 app.post('/api/login', async (req, res) => {
   try {
     const { nome, senha } = req.body;
@@ -157,9 +141,7 @@ app.post('/api/logout', (req, res) => {
   });
 });
 
-// ==============================
-// 👥 ROTAS DE USUÁRIOS
-// ==============================
+
 app.get('/api/usuarios', async (req, res) => {
   try {
     const search = req.query.q ? `%${req.query.q}%` : '%';
@@ -185,7 +167,6 @@ app.get('/api/usuarios', async (req, res) => {
   }
 });
 
-// Buscar usuário por ID
 app.get("/api/usuarios/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -215,9 +196,6 @@ app.get("/api/usuarios/:id", async (req, res) => {
   }
 });
 
-// =========================
-// SUSPENDER USUÁRIO
-// =========================
 app.put("/api/usuarios/suspender", async (req, res) => {
   try {
     const { id, motivo } = req.body;
@@ -239,10 +217,6 @@ app.put("/api/usuarios/suspender", async (req, res) => {
   }
 });
 
-
-// =========================
-// ATIVAR USUÁRIO
-// =========================
 app.put("/api/usuarios/ativar", async (req, res) => {
   try {
     const { id, motivo } = req.body;
@@ -264,9 +238,6 @@ app.put("/api/usuarios/ativar", async (req, res) => {
   }
 });
 
-// ==============================
-// 📊 ROTA DE ESTATÍSTICAS
-// ==============================
 app.get('/api/stats', async (req, res) => {
   try {
     const [receitas] = await db.query('SELECT COUNT(*) AS total FROM receitas');
@@ -283,7 +254,6 @@ app.get('/api/stats', async (req, res) => {
   }
 });
 
-
 app.get("/api/usuariosPorMes", async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -299,10 +269,6 @@ app.get("/api/usuariosPorMes", async (req, res) => {
     res.status(500).json({ erro: err });
   }
 });
-
-// ==============================
-// 📊 GRÁFICO — Porcentagem de receitas por ingrediente
-// ==============================
 
 app.get("/api/graficos/ingredientes-populares", async (req, res) => {
   try {
@@ -330,9 +296,6 @@ app.get("/api/graficos/ingredientes-populares", async (req, res) => {
   }
 });
 
-// ==============================
-// 📊 INGREDIENTES MAIS USADOS
-// ==============================
 app.get("/api/ingredientesMaisUsados", async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -343,7 +306,6 @@ app.get("/api/ingredientesMaisUsados", async (req, res) => {
       ORDER BY total DESC;
     `);
 
-    // Se tiver menos que 10, retorna tudo
     if (rows.length <= 10) return res.json(rows);
 
     const top10 = rows.slice(0, 10);
@@ -360,9 +322,6 @@ app.get("/api/ingredientesMaisUsados", async (req, res) => {
   }
 });
 
-// ==============================================
-// 📊 RECEITAS POR CATEGORIA (%)
-// ==============================================
 app.get("/api/graficos/receitas-por-categoria", async (req, res) => {
   try {
     const [rows] = await db.query(`
@@ -405,9 +364,6 @@ app.get("/api/graficos/receitas-mais-acessadas", async (req, res) => {
   }
 });
 
-// ==============================
-// 👨‍💼 ROTAS DE ADMINISTRADORES
-// ==============================
 app.post('/api/adm/cadastro', async (req, res) => {
   try {
     const { nome, senha } = req.body;
@@ -471,9 +427,6 @@ app.delete('/api/adm/:id', async (req, res) => {
   }
 });
 
-// ==============================
-// 🍳 ROTAS DE RECEITAS
-// ==============================
 app.get('/api/receitas', async (req, res) => {
   try {
     const q = req.query.q ? `%${req.query.q}%` : '%';
@@ -505,7 +458,6 @@ app.get('/api/receitas', async (req, res) => {
   }
 });
 
-// Deletar receita
 app.delete('/api/receitas/:id', async (req, res) => {
   const id = parseInt(req.params.id, 10);
   if (isNaN(id)) return res.status(400).json({ error: 'ID inválido' });
@@ -560,7 +512,6 @@ app.post("/api/atualizar-receita", async (req, res) => {
             return res.status(400).json({ error: "ID da receita é obrigatório." });
         }
 
-        // Converter undefined para null
         const safeValues = [
             nome ?? null,
             descricao ?? null,
@@ -597,11 +548,6 @@ app.post("/api/atualizar-receita", async (req, res) => {
     }
 });
 
-
-
-// ==============================
-// 🧾 ROTAS DE DENÚNCIAS
-// ==============================
 app.get('/api/denuncias', async (req, res) => {
   try {
     const q = req.query.q ? `%${req.query.q}%` : '%';
@@ -644,8 +590,5 @@ app.put('/api/denuncias/:id/status', async (req, res) => {
   }
 });
 
-// ==============================
-// 🚀 INICIAR SERVIDOR
-// ==============================
 const PORT = 3000;
 app.listen(PORT, () => console.log(`Servidor rodando em http://localhost:${PORT}`));

@@ -1,64 +1,48 @@
-// Colar este script no final do body (substitui scripts anteriores)
 document.addEventListener('DOMContentLoaded', () => {
 
-  // Instâncias globais para evitar recriação duplicada
     window.graficoIngredientesInstancia = null;
     window.graficoReceitasInstancia = null;
     window.graficoUsuariosInstancia = null;
 
-  // ---------- Helpers ----------
   const exists = v => v !== null && v !== undefined;
   const escapeHtml = s => String(s || '')
     .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
 
-  // ---------- DOM elements ----------
   const adminInfo = document.getElementById('admin-info');
 
-  // telas / navegação
   const navItems = document.querySelectorAll('.nav-item');
   const pageTitle = document.getElementById('page-title');
 
-  // receitas cadastradas
   const listaReceitas = document.getElementById('receitas-lista');
   const searchCadastradas = document.getElementById('search-receita');
 
-  // delete modal (confirmação)
   const deleteModal = document.getElementById('delete-modal');
   const confirmDeleteBtn = document.getElementById('confirm-delete');
   const cancelDeleteBtn = document.getElementById('cancel-delete');
 
-  // receitas recebidas
   const containerReceitasRecebidas = document.getElementById('receitas-recebidas-container');
   const searchRecebidas = document.getElementById('search-receita-recebida');
 
-  // modal unificado (ver / editar / aceitar / rejeitar)
-  const modalUnificado = document.getElementById('modal-receita'); // envolve
+  const modalUnificado = document.getElementById('modal-receita'); 
   const conteudoModal = document.getElementById('conteudo-receita');
   const btnFecharModal = document.getElementById('fechar-modal');
 
-  // denuncias / dashboard
   const searchDenuncia = document.getElementById('search-denuncia');
 
-  // ---------- Estado ----------
-  let receitasRecebidas = []; // local array das recebidas
+  let receitasRecebidas = []; 
   let paginaAtualRecebidas = 0;
   const receitasPorPagina = 5;
 
   let receitaIdParaExcluir = null;
-  let excluirContext = null; // 'cadastrada' | 'recebida'
+  let excluirContext = null; 
 
-  // ---------- Inicialização ----------
   mostrarUsuarioLogado();
   fetchStats();
   fetchSites();
   fetchIngredientes();
   fetchDenuncias();
 
-  // Mostrar dashboard por padrão (nav já setada)
-  // ---------- Funções principais ----------
-
-  // Usuário logado
   async function mostrarUsuarioLogado() {
     if (!exists(adminInfo)) return;
     try {
@@ -72,21 +56,17 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // --------- NAV e troca de telas ----------
-const screens = ['dashboard', 'receitas', 'denuncias', 'graficos'];
+const screens = ['dashboard', 'receitas', 'graficos'];
 
 navItems.forEach(item => {
   item.addEventListener('click', e => {
     e.preventDefault();
 
-    // Atualiza menu ativo
     navItems.forEach(i => i.classList.remove('active'));
     item.classList.add('active');
 
-    // Nome da tela
     const screen = item.getAttribute('data-screen');
 
-    // Atualiza título da página
     pageTitle.textContent =
       screen === 'dashboard' ? 'Visão Geral' :
       screen === 'receitas' ? 'Receitas Cadastradas' :
@@ -94,13 +74,11 @@ navItems.forEach(item => {
       screen === 'graficos' ? 'Gráficos Gerais' :
       '';
 
-    // Exibe apenas a tela selecionada
     screens.forEach(s => {
       const sec = document.getElementById('screen-' + s);
       if (sec) sec.style.display = (s === screen) ? 'block' : 'none';
     });
 
-    // Carregar dados quando abrir cada aba
     if (screen === 'receitas') {
       fetchReceitas();
     }
@@ -110,7 +88,6 @@ navItems.forEach(item => {
     }
 
     if (screen === 'graficos') {
-      // Aguarda a tela aparecer antes de carregar o gráfico
       setTimeout(() => {
         carregarGraficos();
       }, 50);
@@ -118,7 +95,6 @@ navItems.forEach(item => {
   });
 });
 
-  // ---------- RECEITAS CADASTRADAS (API) ----------
   async function fetchReceitas(query = '') {
     if (!exists(listaReceitas)) return;
     listaReceitas.innerHTML = '<li>Carregando...</li>';
@@ -151,14 +127,12 @@ navItems.forEach(item => {
             </div>
           </div>
           <div style="margin-left:auto;display:flex;gap:8px">
-            <button style="font-family: 'Poppins', sans-serif ; width:'80px';background-color:#9aa3b2;" class="btn-ver" data-id="${r.id}" title="Ver Mais">Ver Mais</button>
+            <button style="font-family: 'Poppins', sans-serif ; width:'80px';background-color:#000;border:none;border-radius:6px;width:80px;color:#fff;" class="btn-ver" data-id="${r.id}" title="Ver Mais">Ver Mais</button>
             <button class="btn-excluir" data-id="${r.id}" title="Excluir">Excluir</button>
           </div>
         `;
 
-        // anexar listeners usando closures
         li.querySelector('.btn-ver').addEventListener('click', async () => {
-          // tenta buscar a receita completa por id
           try {
             const resp = await fetch(`http://localhost:3001/receitaDet/${r.id}`);
             if (resp.ok) {
@@ -187,14 +161,12 @@ navItems.forEach(item => {
     }
   }
 
-  // search input (cadastradas)
   if (exists(searchCadastradas)) {
     searchCadastradas.addEventListener('input', () => {
       fetchReceitas(searchCadastradas.value);
     });
   }
 
-  // ---------- CONFIRMA EXCLUSÃO ----------
   if (exists(confirmDeleteBtn)) {
     confirmDeleteBtn.addEventListener('click', async () => {
       if (!receitaIdParaExcluir) return;
@@ -202,17 +174,16 @@ navItems.forEach(item => {
         if (excluirContext === 'cadastrada') {
           const res = await fetch(`http://localhost:3000/api/receitas/${receitaIdParaExcluir}`, { method: 'DELETE' });
           const data = await res.json();
-          alert(data.message || 'Receita excluída!');
+          showMessage(data.message || 'Receita excluída!');
           fetchReceitas(searchCadastradas?.value || '');
         } else if (excluirContext === 'recebida') {
-          // remove local
           receitasRecebidas = receitasRecebidas.filter(r => r.id !== receitaIdParaExcluir);
           paginaAtualRecebidas = 0;
           renderReceitasRecebidasPagina();
         }
       } catch (err) {
         console.error('Erro excluir', err);
-        alert('Erro ao excluir receita.');
+        showMessage('Erro ao excluir receita.');
       } finally {
         receitaIdParaExcluir = null;
         excluirContext = null;
@@ -228,14 +199,12 @@ navItems.forEach(item => {
     });
   }
 
-  // ---------- RECEITAS RECEBIDAS (importar/paginar) ----------
   async function carregarReceitasRecebidas() {
     if (!exists(containerReceitasRecebidas)) return;
     containerReceitasRecebidas.innerHTML = 'Carregando receitas...';
     receitasRecebidas = [];
     paginaAtualRecebidas = 0;
     try {
-      // exemplo: 10 requisições de import (seu código original fazia isso)
       const requests = Array.from({ length: 10 }, () =>
         fetch('http://localhost:3000/api/importar-receita').then(r => r.ok ? r.json() : null)
       );
@@ -302,12 +271,10 @@ navItems.forEach(item => {
     }
   }
 
-  // busca local para recebidas
   if (exists(searchRecebidas)) {
     searchRecebidas.addEventListener('input', () => {
       const termo = searchRecebidas.value.trim().toLowerCase();
       if (!termo) { paginaAtualRecebidas = 0; renderReceitasRecebidasPagina(); return; }
-      // renderizar somente filtradas (sem paginação)
       const filtradas = receitasRecebidas.filter(r => (r.nome || '').toLowerCase().includes(termo));
       containerReceitasRecebidas.innerHTML = '';
       if (!filtradas.length) { containerReceitasRecebidas.innerHTML = '<p>Nenhuma receita correspondente.</p>'; return; }
@@ -345,10 +312,7 @@ navItems.forEach(item => {
     });
   }
 
-  // ---------- MODAL UNIFICADO0 (VER + EDIT dentro do modal) ----------
-  // abrirModalUnificado(receita, source, options)
   function abrirModalUnificado(receita = {}, source = 'cadastrada', options = {}) {
-    // options.startEditing -> se true, já ativa edição
     const tabela = receita.tabelaNutricional || receita.tabela || null;
 
      conteudoModal.innerHTML = `
@@ -357,7 +321,7 @@ navItems.forEach(item => {
         <img src="${receita.imagem || 'https://via.placeholder.com/600x300'}"
             class="modal-img">
 
-        <h2 id="modal-nome" class="modal-field">${escapeHtml(receita.nome || '')}</h2>
+        <h2 id="modal-nome" style="font-family: 'Poppins', sans-serif ;" class="modal-field">${escapeHtml(receita.nome || '')}</h2>
         <p id="modal-autor" class="modal-field" style="color:#666">
           Por ${escapeHtml(receita.autor || receita.usuario || 'Autor desconhecido')}
         </p>
@@ -411,30 +375,24 @@ navItems.forEach(item => {
         </div>
       `;
 
-    // mostrar modal
     if (modalUnificado) modalUnificado.style.display = 'flex';
                         modalUnificado.style.justifyContent = "center";
                         modalUnificado.style.alignItems = "flex-start";
 
-
-    // close handlers
     const fecharTop = document.getElementById('fechar-modal-top');
     if (fecharTop) fecharTop.onclick = () => { modalUnificado.style.display = 'none'; };
 
-    // Buttons
     const btnEditar = document.getElementById('modal-btn-editar');
     const btnSalvar = document.getElementById('modal-btn-salvar');
     const btnAceitar = document.getElementById('modal-btn-aceitar');
     const btnRejeitar = document.getElementById('modal-btn-rejeitar');
 
-    // editing state
     let editing = false;
 
-    // enable editing function: transform displayed nodes into contenteditable fields
     function enableEditing() {
       if (editing) return;
       editing = true;
-      // transformar campos em editáveis:
+
       const nomeEl = document.getElementById('modal-nome');
       const autorEl = document.getElementById('modal-autor');
       const descEl = document.getElementById('modal-descricao');
@@ -442,12 +400,10 @@ navItems.forEach(item => {
       const utensiliosEl = document.getElementById('modal-utensilios');
       const passosEl = document.getElementById('modal-passos');
 
-      // nome / autor / descricao -> contenteditable
       if (nomeEl) { nomeEl.contentEditable = "true"; nomeEl.style.borderBottom = "1px dashed #ccc"; }
       if (autorEl) { autorEl.contentEditable = "true"; }
       if (descEl) { descEl.contentEditable = "true"; descEl.style.minHeight = "40px"; descEl.style.border = "1px dashed #eee"; descEl.style.padding = "6px"; }
 
-      // ingredientes -> transformar cada <p> em <li contenteditable> dentro de <ul>
       if (ingredientesEl) {
         const items = Array.from(ingredientesEl.querySelectorAll('p')).map(p => p.textContent.replace(/^🍴\s*/, ''));
         const ul = document.createElement('ul');
@@ -459,14 +415,12 @@ navItems.forEach(item => {
           li.innerText = it;
           ul.appendChild(li);
         });
-        // adiciona linha vazia para facilitar inserção
         const liNew = document.createElement('li'); liNew.contentEditable = "true"; liNew.innerText = '';
         ul.appendChild(liNew);
         ingredientesEl.innerHTML = '<strong style="display:block;margin-bottom:6px">🍴 Ingredientes (edite):</strong>';
         ingredientesEl.appendChild(ul);
       }
 
-      // utensilios
       if (utensiliosEl) {
         const items = Array.from(utensiliosEl.querySelectorAll('p')).map(p => p.textContent.replace(/^🥄\s*/, ''));
         const ul = document.createElement('ul'); ul.id = 'modal-edit-utensilios'; ul.style.paddingLeft='20px';
@@ -476,10 +430,8 @@ navItems.forEach(item => {
         utensiliosEl.appendChild(ul);
       }
 
-      // passos
       if (passosEl) {
         const items = Array.from(passosEl.querySelectorAll('p')).map(p => {
-          // remove leading "N. "
           return p.textContent.replace(/^\d+\.\s*/, '');
         });
         const ol = document.createElement('ol'); ol.id = 'modal-edit-passos'; ol.style.paddingLeft='20px';
@@ -489,14 +441,13 @@ navItems.forEach(item => {
         passosEl.appendChild(ol);
       }
 
-      // mostra botão salvar
       if (btnSalvar) btnSalvar.style.display = 'inline-block';
       if (btnEditar) btnEditar.style.display = 'none';
     }
 
     function disableEditing() {
       editing = false;
-      // remover estilos / contentEditable e reconstruir a visual com valores atualizados
+
       const nomeEl = document.getElementById('modal-nome');
       const autorEl = document.getElementById('modal-autor');
       const descEl = document.getElementById('modal-descricao');
@@ -505,7 +456,6 @@ navItems.forEach(item => {
       if (autorEl) { autorEl.contentEditable = "false"; }
       if (descEl) { descEl.contentEditable = "false"; descEl.style.border = "none"; descEl.style.padding = "0"; }
 
-      // ingredientes
       const ingEdit = document.getElementById('modal-edit-ingredientes');
       if (ingEdit) {
         const valores = Array.from(ingEdit.querySelectorAll('li')).map(li => li.innerText.trim()).filter(Boolean);
@@ -513,7 +463,6 @@ navItems.forEach(item => {
         ingredientesEl.innerHTML = valores.map(v => `<p>🍴 ${escapeHtml(v)}</p>`).join('');
       }
 
-      // utensilios
       const utEdit = document.getElementById('modal-edit-utensilios');
       if (utEdit) {
         const valores = Array.from(utEdit.querySelectorAll('li')).map(li => li.innerText.trim()).filter(Boolean);
@@ -521,7 +470,6 @@ navItems.forEach(item => {
         utensiliosEl.innerHTML = valores.length ? valores.map(v => `<p>🥄 ${escapeHtml(v)}</p>`).join('') : '<p>Sem utensílios informados.</p>';
       }
 
-      // passos
       const passosEdit = document.getElementById('modal-edit-passos');
       if (passosEdit) {
         const valores = Array.from(passosEdit.querySelectorAll('li')).map(li => li.innerText.trim()).filter(Boolean);
@@ -529,15 +477,12 @@ navItems.forEach(item => {
         passosEl.innerHTML = valores.map((p, idx) => `<p>${idx+1}. ${escapeHtml(p)}</p>`).join('');
       }
 
-      // esconder salvar e mostrar editar
       if (btnSalvar) btnSalvar.style.display = 'none';
       if (btnEditar) btnEditar.style.display = 'inline-block';
     }
 
-    // editar click
     if (btnEditar) btnEditar.addEventListener('click', () => enableEditing());
 
-    // salvar click
     if (btnSalvar) btnSalvar.addEventListener('click', async () => {
       const novoNome = document.getElementById('modal-nome')?.innerText.trim() || receita.nome;
       const novoAutor = document.getElementById('modal-autor')?.innerText.trim() || receita.autor;
@@ -564,11 +509,9 @@ navItems.forEach(item => {
               .filter(Boolean)
           : receita.passos;
 
-      // GARANTIR QUE VALORES VAZIOS NÃO SUBSTITUEM OS ORIGINAIS
       const payload = {
         id_receitas: receita.id || receita.id_receitas,
 
-        // CAMPOS EDITADOS
         nome: novoNome || receita.nome,
         descricao: novaDesc || receita.descricao,
         instrucoes: novaDesc || receita.instrucoes,
@@ -585,7 +528,6 @@ navItems.forEach(item => {
           ? novosPassos
           : receita.passos,
 
-        // CAMPOS OCULTOS NO MODAL → precisam ser mantidos
         tempo_preparo: receita.tempo_preparo ?? receita.tempo ?? null,
         id_categoria: receita.id_categoria ?? null,
         id_ingrediente_base: receita.id_ingrediente_base ?? null,
@@ -604,15 +546,14 @@ navItems.forEach(item => {
         const data = await res.json();
 
         if (data.success) {
-          alert('Receita atualizada com sucesso!');
+          showMessage('Receita atualizada com sucesso!');
         } else {
-          alert('Erro ao atualizar: ' + (data.message || ''));
+          showMessage('Erro ao atualizar: ' + (data.message || ''));
         }
       } catch (err) {
         console.error('Erro salvar edição', err);
-        alert('Erro ao salvar alterações.');
+        showMessage('Erro ao salvar alterações.');
       } finally {
-        // Atualiza a receita original
         receita.nome = payload.nome;
         receita.descricao = payload.descricao;
         receita.instrucoes = payload.instrucoes;
@@ -625,7 +566,6 @@ navItems.forEach(item => {
       }
     });
 
-    // aceitar (só para recebida)
     if (btnAceitar) btnAceitar.addEventListener('click', async () => {
       try {
         const response = await fetch('http://localhost:3001/publicar', {
@@ -648,22 +588,20 @@ navItems.forEach(item => {
         });
         const data = await response.json();
         if (data.success) {
-          alert(`Receita "${receita.nome}" validada e salva no banco!`);
-          // remover local se vinha de recebidas
+          showMessage(`Receita "${receita.nome}" validada e salva no banco!`);
           receitasRecebidas = receitasRecebidas.filter(r => r.id !== receita.id);
           paginaAtualRecebidas = 0;
           renderReceitasRecebidasPagina();
           modalUnificado.style.display = 'none';
         } else {
-          alert('Erro ao salvar receita: ' + (data.message || ''));
+          showMessage('Erro ao salvar receita: ' + (data.message || ''));
         }
       } catch (err) {
         console.error('Erro ao aceitar receita', err);
-        alert('Erro ao salvar receita no servidor.');
+        showMessage('Erro ao salvar receita no servidor.');
       }
     });
 
-    // rejeitar (só para recebida)
     if (btnRejeitar) btnRejeitar.addEventListener('click', () => {
       if (confirm('Tem certeza que deseja rejeitar esta receita?')) {
         receitasRecebidas = receitasRecebidas.filter(r => r.id !== receita.id);
@@ -672,16 +610,13 @@ navItems.forEach(item => {
       }
     });
 
-    // start editing if requested
     if (options.startEditing) enableEditing();
   }
 
-  // fechar modal unificado com X do topo (fora do innerHTML)
   if (exists(btnFecharModal) && exists(modalUnificado)) {
     btnFecharModal.addEventListener('click', () => { modalUnificado.style.display = 'none'; });
   }
 
-  // ---------- DENÚNCIAS / STATS / SITES / INGREDIENTES ----------
   async function fetchDenuncias(q = '') {
     try {
       const res = await fetch(`http://localhost:3000/api/denuncias?q=${encodeURIComponent(q)}`);
@@ -714,7 +649,7 @@ navItems.forEach(item => {
           </div>
         `;
       });
-      // bind status checkboxes
+
       document.querySelectorAll('.status-checkbox').forEach(chk => {
         chk.addEventListener('change', async e => {
           const id = e.target.dataset.id;
@@ -819,7 +754,6 @@ navItems.forEach(item => {
             return;
         }
 
-        // Evitar recriar o gráfico várias vezes
         if (window.graficoIngredientesInstancia) {
             window.graficoIngredientesInstancia.destroy();
         }
@@ -871,7 +805,6 @@ async function carregarGraficoIngredientes() {
 
     if (!ctx) return console.error("Canvas graficoIngredientes não encontrado!");
 
-    // 🔥 Destruir gráfico anterior
     if (window.graficoIngredientesInstancia) {
       window.graficoIngredientesInstancia.destroy();
     }
@@ -915,7 +848,6 @@ async function carregarGraficoReceitasPorCategoria() {
 
     if (!ctx) return console.error("Canvas graficoReceitasCategoria não encontrado!");
 
-    // 🔥 Destruir gráfico anterior
     if (window.graficoReceitasCategoriaInstancia) {
       window.graficoReceitasCategoriaInstancia.destroy();
     }
@@ -970,7 +902,6 @@ async function carregarGraficoReceitasMaisAcessadas() {
       return;
     }
 
-    // destruir instância antiga
     if (window.graficoReceitasMaisAcessadasInstancia) {
       window.graficoReceitasMaisAcessadasInstancia.destroy();
     }
@@ -984,7 +915,9 @@ async function carregarGraficoReceitasMaisAcessadas() {
           data: valores,
           backgroundColor: "rgba(54, 162, 235, 0.7)",
           borderColor: "rgba(54, 162, 235, 1)",
-          borderWidth: 2
+          borderWidth: 2,
+          barThickness: 30,
+          maxBarThickness: 32  
         }]
       },
       options: {
@@ -994,9 +927,9 @@ async function carregarGraficoReceitasMaisAcessadas() {
           x: { beginAtZero: true },
           y: {
             ticks: {
-              callback: function(value) {
-                const label = this.getLabelForValue(value);
-                return label.length > 25 ? label.substring(0, 25) + "..." : label;
+              callback: function(_, index) {
+                const label = this.chart.data.labels[index];
+                return label.length > 30 ? label.substring(0, 15) + "..." : label;
               }
             }
           }
@@ -1015,8 +948,6 @@ async function carregarGraficoReceitasMaisAcessadas() {
   }
 }
 
-
-  // ---------- Expose some functions to global if needed (optional) ----------
   window.abrirModalUnificado = abrirModalUnificado;
   window.fetchReceitas = fetchReceitas;
   window.carregarReceitasRecebidas = carregarReceitasRecebidas;

@@ -37,7 +37,6 @@
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
 
 <style>
-/* ===== Fonte ===== */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
 
 :root{
@@ -51,7 +50,6 @@
   --radius-lg: 20px;
 }
 
-/* ===== Reset / Base ===== */
 *{box-sizing:border-box}
 html,body{height:100%}
 body {
@@ -68,14 +66,12 @@ body {
   padding: 30px;
 }
 
-/* ===== Wrapper (centraliza e limita largura) ===== */
 #login-wrapper{
   width: 100%;
   max-width: 1100px;
   margin: 0 auto;
 }
 
-/* ===== Container principal dividido ===== */
 #login-container {
   display: flex;
   width: 100%;
@@ -87,7 +83,6 @@ body {
   align-items: stretch;
 }
 
-/* ===== LADO ESQUERDO: imagem / branding ===== */
 .login-image-side {
   flex: 1 1 50%;
   min-width: 320px;
@@ -124,19 +119,17 @@ body {
   max-width: 260px;
 }
 
-/* ===== LADO DIREITO: form ===== */
 #login-screen {
   flex: 1 1 50%;
   padding: 48px 44px;
   background: var(--bg-white);
   display: flex;
   flex-direction: column;
-  justify-content: center;   /* centraliza verticalmente */
+  justify-content: center; 
   align-items: stretch;
   position: relative;
 }
 
-/* botão voltar (posicionado dentro do card) */
 #login-screen .back-button {
   position: absolute;
   left: 18px;
@@ -150,9 +143,9 @@ body {
   padding: 6px;
   transition: transform .15s ease;
 }
+
 #login-screen .back-button:hover{ transform: translateX(-4px) }
 
-/* título principal */
 #login-screen h1{
   margin: 0 0 8px 0;
   font-size: 22px;
@@ -161,7 +154,6 @@ body {
   text-align: left;
 }
 
-/* subtítulo / instrução (opcional) */
 #login-screen .subtitle {
   font-size: 13px;
   margin-bottom: 20px;
@@ -169,14 +161,12 @@ body {
   text-align: left;
 }
 
-/* formulário - centralizado no lado direito com largura limitada */
 .form-wrap{
   width: 100%;
   max-width: 360px;
   margin: 0 auto;
 }
 
-/* grupos e inputs */
 .form-group {
   margin-bottom: 16px;
   position: relative;
@@ -201,7 +191,6 @@ input[type="password"]::placeholder{
   color: #bdbdbd;
 }
 
-/* foco */
 input[type="text"]:focus,
 input[type="password"]:focus{
   box-shadow: 0 6px 20px rgba(255, 99, 0, 0.12);
@@ -209,14 +198,12 @@ input[type="password"]:focus{
   transform: translateY(-1px);
 }
 
-/* mensagem de erro */
 .error-message{
   color: var(--orange-600);
   font-size: 13px;
   margin-top: 6px;
 }
 
-/* botão entrar */
 .button-login{
   display: inline-block;
   width: 100%;
@@ -238,7 +225,6 @@ input[type="password"]:focus{
   box-shadow: 0 12px 26px rgba(255,99,0,0.18);
 }
 
-/* mensagem inferior */
 #login-msg{
   margin-top: 12px;
   font-size: 14px;
@@ -246,7 +232,6 @@ input[type="password"]:focus{
   text-align: center;
 }
 
-/* footer dentro do card (opcional) */
 .login-footer{
   margin-top: 18px;
   text-align: center;
@@ -254,10 +239,8 @@ input[type="password"]:focus{
   color: #979797;
 }
 
-/* ===== Pequenos ajustes visuais ===== */
 #login-container::-webkit-scrollbar{ display:none }
 
-/* ===== RESPONSIVO ===== */
 @media (max-width: 960px){
   #login-container{
     height: auto;

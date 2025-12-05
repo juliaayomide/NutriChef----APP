@@ -1,5 +1,3 @@
-/* === Estilo do card de usuários do dashboard === */
-
 .users-card {
   padding: 12px;
   margin-top: 16px;
@@ -22,6 +20,7 @@
   color: inherit;
   margin-bottom: 10px;
   background-color:#fafafa;
+  border:1px solid var(--soft-border);background:#fbfbfb
 }
 
 .users-list {
@@ -81,7 +80,7 @@ titulo{
 }
 
 .btn-vermais {
-  background: #3498db;
+  background:#000;
   border: none;
   color: white;
   padding: 5px 10px;
@@ -90,10 +89,6 @@ titulo{
     font-family: 'Poppins', sans-serif ;
   font-weight: 500;
 }
-
-/* ===========================
-    MODAL DE USUÁRIO
-=========================== */
 
 .modal-usuario {
   position: fixed;
@@ -130,7 +125,7 @@ titulo{
   text-align: center;
   margin-bottom: 25px;
   color: #222;
-  font-size: 26px;       /* 🔥 TÍTULO MAIOR */
+  font-size: 26px;      
   font-weight: 700;
   letter-spacing: 0.3px;
 }
@@ -145,7 +140,6 @@ titulo{
   text-align: start;
 }
 
-/* Botão de fechar */
 .close-btn {
   position: absolute;
   top: 14px;
@@ -163,7 +157,6 @@ titulo{
   transform: scale(1.08);
 }
 
-/* Animação suave */
 @keyframes modalIn {
   from {
     opacity: 0;

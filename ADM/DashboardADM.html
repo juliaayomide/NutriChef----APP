@@ -231,9 +231,9 @@
           <!-- LOADER DE PORCENTAGEM -->
           <div id="loader-progress" class="loader-progress-container" style="display:none;">
             <div class="progress-circle">
-              <div id="progress-number">0%</div>
+              <div id="progress-number" style="font-family: 'poppins', sans-serif;" >0%</div>
             </div>
-            <span id="progress-text">Coletando receitas...</span>
+            <span id="progress-text" style="font-family: 'poppins', sans-serif;">Coletando receitas...</span>
           </div>
         </div>
       </div>
@@ -245,7 +245,7 @@
   <div class="modal-msg-content">
     <h3 id="modal-msg-titulo">Mensagem</h3>
     <p id="modal-msg-texto"></p>
-    <button id="modal-msg-btn">OK</button>
+    <button id="modal-msg-btn" style="font-family: 'poppins', sans-serif;">OK</button>
   </div>
 </div>
 
@@ -278,17 +278,14 @@ const fecharRpa = document.getElementById("fechar-modal-rpa");
 const btnExecutarRpa = document.getElementById("btn-executar-rpa");
 const inputTermo = document.getElementById("rpa-termo");
 
-// abrir modal
 btnRpa.addEventListener("click", () => {
   modalRpa.classList.remove("hidden");
 });
 
-// fechar modal
 fecharRpa.addEventListener("click", () => {
   modalRpa.classList.add("hidden");
 });
 
-// executar RPA
 btnExecutarRpa.addEventListener("click", async () => {
   const termo = inputTermo.value.trim();
 
@@ -299,7 +296,6 @@ btnExecutarRpa.addEventListener("click", async () => {
 
   const loader = document.getElementById("loader-progress");
 
-  // esconder campos e mostrar loader
   btnExecutarRpa.style.display = "none";
   inputTermo.style.display = "none";
   loader.style.display = "flex";
@@ -376,7 +372,6 @@ async function carregarUsuarios() {
 
     const ctx = document.getElementById("graficoUsuarios").getContext("2d");
 
-    // Gradiente suave azul
     const gradient = ctx.createLinearGradient(0, 0, 0, 300);
     gradient.addColorStop(0, "rgba(0, 122, 255, 0.35)");
     gradient.addColorStop(1, "rgba(0, 122, 255, 0)");
@@ -452,8 +447,6 @@ carregarUsuarios();
 const sidebar = document.getElementById("sidebar");
 const toggleBtn = document.getElementById("toggle-sidebar");
 
-// Desktop: sidebar padrão
-// Mobile: sidebar inicia compacta
 function updateSidebarMode() {
   if (window.innerWidth <= 920) {
     sidebar.classList.add("compact");
@@ -466,7 +459,6 @@ function updateSidebarMode() {
 updateSidebarMode();
 window.addEventListener("resize", updateSidebarMode);
 
-// Botão de expandir/recolher
 toggleBtn.addEventListener("click", () => {
   if (sidebar.classList.contains("expanded")) {
     sidebar.classList.remove("expanded");
