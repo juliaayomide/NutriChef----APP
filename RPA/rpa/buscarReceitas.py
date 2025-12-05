@@ -8,9 +8,6 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 
-# ==============================
-# CONEXÃO COM O BANCO
-# ==============================
 def conectar_mysql():
     try:
         conn = mysql.connector.connect(
@@ -26,9 +23,6 @@ def conectar_mysql():
         print(f"[ERRO] Falha ao conectar ao MySQL: {e}")
         exit()
 
-# ==============================
-# FUNÇÕES AUXILIARES
-# ==============================
 def limpar_ingrediente(texto):
     texto = re.sub(r'^[^\w]+', '', texto)
     return texto.replace("null", "").strip()
@@ -65,9 +59,6 @@ def parse_porcoes(texto):
     nums = re.findall(r'\d+', texto)
     return int(nums[-1]) if nums else 1
 
-# ==============================
-# DETECÇÃO DE UTENSÍLIOS
-# ==============================
 UTENSILIOS_CONHECIDOS = [
     "frigideira", "panela", "assadeira", "tigela", "colher", "batedeira",
     "liquidificador", "forno", "espátula", "ralador", "faca", "peneira",
@@ -79,9 +70,6 @@ def detectar_utensilios(passos):
     encontrados = [u.capitalize() for u in UTENSILIOS_CONHECIDOS if u in texto]
     return list(set(encontrados))
 
-# ==============================
-# CLASSIFICAÇÃO E FILTROS
-# ==============================
 def classificar_categoria(nome, ingredientes, modo_preparo):
 
     if isinstance(ingredientes, list):
@@ -153,9 +141,6 @@ def eh_saudavel(ingredientes):
     texto = " ".join(ingredientes).lower()
     return not any(p in texto for p in INGREDIENTES_ULTRAPROCESSADOS)
 
-# ==============================
-# INSERÇÃO NO BANCO
-# ==============================
 def inserir_categoria(cursor, nome_categoria):
     cursor.execute("SELECT id_categorias FROM categorias WHERE nome=%s", (nome_categoria,))
     res = cursor.fetchone()
@@ -220,7 +205,6 @@ def salvar_receitas_no_banco(conn, receitas, termo):
             ))
             id_receita = cursor.lastrowid
 
-            # ingredientes
             for ing in r["ingredientes"]:
                 id_ing = inserir_ingrediente(cursor, limpar_ingrediente(ing))
                 cursor.execute("""
@@ -228,7 +212,6 @@ def salvar_receitas_no_banco(conn, receitas, termo):
                     VALUES (%s, %s, NULL, NULL)
                 """, (id_ing, id_receita))
 
-            # utensílios
             for ut in r["utensilios"]:
                 id_ut = inserir_utensilio(cursor, ut)
                 cursor.execute("""
@@ -236,7 +219,6 @@ def salvar_receitas_no_banco(conn, receitas, termo):
                     VALUES (%s, %s)
                 """, (id_receita, id_ut))
 
-            # passos
             for idx, passo in enumerate(r["preparo"], 1):
                 cursor.execute("""
                     INSERT INTO receita_passos (id_receitas, descricao, ordem)
@@ -254,9 +236,6 @@ def salvar_receitas_no_banco(conn, receitas, termo):
     return total_salvas 
 
 
-# ==============================
-# SCRAPING VIA SELENIUM
-# ==============================
 def coletar_panelinha_selenium(termo, max_receitas=15):
     options = Options()
     options.add_argument("--headless")
@@ -322,9 +301,6 @@ def coletar_panelinha_selenium(termo, max_receitas=15):
     driver.quit()
     return receitas
 
-# ==============================
-# EXECUÇÃO DIRETA
-# ==============================
 if __name__ == "__main__":
     import sys
 
