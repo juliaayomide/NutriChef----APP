@@ -1,8 +1,5 @@
 import { conexao } from "../conexao.js";
 
-// ===============================
-// 🔹 BUSCAR TODOS OS USUÁRIOS
-// ===============================
 export async function buscarUsers() {
   console.log("📘 Buscando todos os usuários...");
   const sql = `SELECT * FROM usuarios;`;
@@ -19,9 +16,6 @@ export async function buscarUsers() {
   }
 }
 
-// ===============================
-// 🔹 CADASTRAR NOVO USUÁRIO
-// ===============================
 export async function incluirUser(infos) {
   console.log("🟢 Cadastro de novo usuário");
   const [email, senha, nome, foto] = infos;
@@ -39,9 +33,6 @@ export async function incluirUser(infos) {
   }
 }
 
-// ===============================
-// 🔹 BUSCAR USUÁRIO POR EMAIL E SENHA (LOGIN)
-// ===============================
 export async function buscarUserPorEmailSenha(email, senha) {
   console.log(`🔍 Verificando login de: ${email}`);
   const sql = `SELECT * FROM usuarios WHERE email = ? AND senha = ?;`;
@@ -64,9 +55,6 @@ export async function buscarUserPorEmailSenha(email, senha) {
   }
 }
 
-// ===============================
-// 🔹 DELETAR USUÁRIO
-// ===============================
 export async function deletarUser(id) {
   const sql = `DELETE FROM usuarios WHERE id_usuarios = ?;`;
   const conn = await conexao();

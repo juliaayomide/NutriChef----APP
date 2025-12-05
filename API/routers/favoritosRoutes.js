@@ -3,9 +3,6 @@ import { conexao } from '../DAO/conexao.js';
 
 const router = express.Router();
 
-// ============================================
-// GET - Buscar favoritos do usuário
-// ============================================
 router.get('/:id_usuario', async (req, res) => {
     const { id_usuario } = req.params;
     const conn = await conexao();
@@ -26,9 +23,6 @@ router.get('/:id_usuario', async (req, res) => {
     }
 });
 
-// ============================================
-// POST /favoritos/add → Adicionar favorito
-// ============================================
 router.post('/add', async (req, res) => {
     const { id_usuario, id_receita } = req.body;
     const conn = await conexao();
@@ -51,9 +45,6 @@ router.post('/add', async (req, res) => {
     }
 });
 
-// ============================================
-// DELETE /favoritos/remove/:id_usuario/:id_receita
-// ============================================
 router.delete('/remove/:id_usuario/:id_receita', async (req, res) => {
     const { id_usuario, id_receita } = req.params;
     const conn = await conexao();

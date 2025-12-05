@@ -1,6 +1,5 @@
 import { Router } from "express";
 
-// DAO
 import {
   buscarReceitaPorId,
   buscarReceitas,
@@ -18,14 +17,9 @@ import {
 
 import { alterUser } from "../DAO/script/alterUser.js";
 
-// Middleware de upload
 import { uploadReceita, uploadPerfil } from "../middleware/script.js";
 
 const router = Router();
-
-// ===============================
-// 🍳 ROTAS DE RECEITA
-// ===============================
 
 router.get("/receitas", async (req, res) => {
   try {
@@ -93,10 +87,6 @@ router.get("/resultados", async (req, res) => {
   }
 });
 
-// ===============================
-// 👤 ROTAS DE USUÁRIO
-// ===============================
-
 router.get("/nutrichef/1.0.0/usuarios", async (req, res) => {
   try {
     const usuarios = await buscarUsers();
@@ -157,7 +147,6 @@ router.post("/nutrichef/1.0.0/logout", (req, res) => {
   });
 });
 
-// Perfil
 router.get("/perfil", (req, res) => {
   const usuario = req.session.usuarioLogado;
   if (!usuario) return res.status(401).json({ success: false, message: "Usuário não logado" });

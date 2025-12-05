@@ -2,9 +2,6 @@ import multer from "multer";
 import path from "path";
 import fs from "fs";
 
-// ===============================
-// 📁 Pastas de upload
-// ===============================
 const pastaUploads = path.join(process.cwd(), "public/uploads");
 const pastaReceitas = path.join(process.cwd(), "public/receitas");
 const pastaUsuarios = path.join(process.cwd(), "public/usuarios");
@@ -13,9 +10,6 @@ const pastaUsuarios = path.join(process.cwd(), "public/usuarios");
   if (!fs.existsSync(pasta)) fs.mkdirSync(pasta, { recursive: true });
 });
 
-// ===============================
-// ⚙️ Middleware genérico para uploads de imagens
-// ===============================
 const storageGen = multer.diskStorage({
   destination: (req, file, cb) => cb(null, pastaUploads),
   filename: (req, file, cb) => {
@@ -32,9 +26,6 @@ const fileFilterGen = (req, file, cb) => {
 
 export const upload = multer({ storage: storageGen, fileFilter: fileFilterGen, limits: { fileSize: 5 * 1024 * 1024 } });
 
-// ===============================
-// ⚙️ Middleware específico para receitas
-// ===============================
 export const uploadReceita = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => cb(null, pastaReceitas),
@@ -51,9 +42,6 @@ export const uploadReceita = multer({
   limits: { fileSize: 5 * 1024 * 1024 },
 });
 
-// ===============================
-// ⚙️ Middleware específico para foto de usuário
-// ===============================
 export const uploadPerfil = multer({
   storage: multer.diskStorage({
     destination: (req, file, cb) => cb(null, pastaUsuarios),

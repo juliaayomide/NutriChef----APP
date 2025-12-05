@@ -1,7 +1,6 @@
 import { conexao } from "../conexao.js";
 
 export const alterUser = {
-  // 🔹 Atualização parcial (PATCH)
   atualizarParcial: async (id, dados) => {
     const campos = [];
     const valores = [];
@@ -16,12 +15,11 @@ export const alterUser = {
     const sql = `UPDATE usuarios SET ${campos.join(", ")} WHERE id_usuarios = ?`;
     valores.push(id);
 
-    const pool = await conexao(); // pega a pool
-    const [resultado] = await pool.query(sql, valores); // query async
+    const pool = await conexao(); 
+    const [resultado] = await pool.query(sql, valores); 
     return resultado;
   },
 
-  // 🔹 Atualização completa (PUT)
   atualizarCompleto: async (id, nome, email, senha, foto) => {
     const sql = "UPDATE usuarios SET nome = ?, email = ?, senha = ?, foto = ? WHERE id_usuarios = ?";
     const pool = await conexao();
