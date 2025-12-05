@@ -291,4 +291,3 @@ LEFT JOIN avaliacoes a ON a.id_receitas = r.id_receitas
 GROUP BY r.id_receitas
 ORDER BY acessos DESC
 LIMIT 10;
-
