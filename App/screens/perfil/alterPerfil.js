@@ -22,9 +22,8 @@ export default function AlterPerfil() {
   const [senha, setSenha] = useState("");
   const [fotoUri, setFotoUri] = useState(null);
 
-  const baseURL = "http://localhost:3001"; // substitua pelo IP da sua máquina
+  const baseURL = "http://localhost:3001"; 
 
-  // ==================== CARREGAR PERFIL ====================
   useEffect(() => {
     fetch(`${baseURL}/perfil`, { credentials: "include" })
       .then((res) => res.json())
@@ -49,7 +48,6 @@ export default function AlterPerfil() {
       });
   }, []);
 
-  // ==================== ESCOLHER FOTO ====================
   const mudarFoto = async () => {
     const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
     if (status !== "granted") {
@@ -67,7 +65,6 @@ export default function AlterPerfil() {
     }
   };
 
-  // ==================== ENVIAR FOTO PARA API ====================
   const enviarFoto = async (uri) => {
     if (!uri || uri.startsWith(baseURL)) return uri;
 
@@ -76,7 +73,6 @@ export default function AlterPerfil() {
         const response = await fetch(uri);
         const blob = await response.blob();
 
-        // Forçar tipo compatível com Multer
         let tipo = blob.type;
         if (tipo === "image/jpg") tipo = "image/jpeg";
         arquivo = new File([blob], uri.split("/").pop(), { type: tipo });
@@ -105,7 +101,6 @@ export default function AlterPerfil() {
     return `${baseURL}${dataFoto.foto}?t=${new Date().getTime()}`;
   };
 
-  // ==================== SALVAR PERFIL ====================
   const handleSalvar = async () => {
     try {
       const resPerfil = await fetch(`${baseURL}/perfil`, {
@@ -188,7 +183,7 @@ const styles = StyleSheet.create({
   btnMudarFotoText: { color: "#fff", fontFamily: "Poppins_700Bold" },
   form: { width: "100%", maxWidth: 400 },
   label: { fontFamily: "Poppins_600SemiBold", marginBottom: 5, marginTop: 10 },
-  input: { padding: 10, borderWidth: 1.5, borderColor: "#ccc", borderRadius: 10, fontSize: 15 },
+  input: { padding: 10, borderWidth: 1.5, borderColor: "#ccc", borderRadius: 10, fontSize: 15, fontFamily: 'Poppins_400Regular', },
   btnSalvar: { backgroundColor: "red", paddingVertical: 14, borderRadius: 12, marginTop: 20, alignItems: "center" },
   btnSalvarText: { color: "#fff", fontFamily: "Poppins_700Bold", fontSize: 16 },
 });

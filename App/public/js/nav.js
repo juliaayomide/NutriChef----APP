@@ -5,12 +5,11 @@ menuToggle.addEventListener('click', () => {
   navbar.classList.toggle('active');
 });
 
-// Barra de Pesquisa
 const inputBusca = document.getElementById("txtBusca");
 
 inputBusca.addEventListener("keypress", function(e) {
     if (e.key === "Enter") {
-        e.preventDefault(); // impede de recarregar a página sem controle
+        e.preventDefault(); 
         const termo = inputBusca.value.trim();
         if (termo) {
             window.location.href = `/resultados?q=${encodeURIComponent(termo)}`;

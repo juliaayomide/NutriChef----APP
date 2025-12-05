@@ -5,7 +5,6 @@ import Header from '../../components/Voltar';
 import BottomNav from '../../components/BottomNav';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
-// 🔹 Gera uma cor fixa e vibrante com base no nome
 function getColorFromName(name) {
   const colors = ['#f1923aff', '#de6868ff', 'rgba(141, 211, 144, 1)', 'rgba(241, 209, 93, 1)'];
   const index = name.charCodeAt(0) % colors.length;

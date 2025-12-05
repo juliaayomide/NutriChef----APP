@@ -26,7 +26,6 @@ export default function Perfil() {
   const fetchPerfil = async () => {
     setLoading(true);
     try {
-      // 1️⃣ Buscar dados do usuário
       const res = await fetch(`${baseURL}/perfil`, { credentials: "include" });
       const data = await res.json();
 
@@ -37,12 +36,11 @@ export default function Perfil() {
       setUsuario(data.usuario);
       setReceitasPublicadas(data.usuario.publicadas || []);
 
-      // 2️⃣ Buscar receitas favoritas do usuário
       const favRes = await fetch(`${baseURL}/favoritos/${data.usuario.id_usuarios}`, {
         credentials: "include",
       });
       const favData = await favRes.json();
-      setReceitasFavoritas(favData || []); // ⚠️ aqui, favData já é array
+      setReceitasFavoritas(favData || []);
     } catch (err) {
       console.error("Erro ao buscar usuário/favoritos:", err);
       navigation.replace("CadastroLogin");
@@ -113,7 +111,6 @@ export default function Perfil() {
           </TouchableOpacity>
         </View>
 
-        {/* Receitas favoritas */}
         <View style={styles.section}>
           <Text style={styles.sectionTitle}>Receitas favoritas</Text>
           <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={{ paddingRight: 20 }}>
@@ -149,7 +146,7 @@ export default function Perfil() {
 }
 
 const styles = StyleSheet.create({
-  container: { backgroundColor: "#fff", padding: 20, },
+  container: { backgroundColor: "#fff", padding: 20, backgroundColor: "#fafafa", },
   perfilInfo: { alignItems: "center", justifyContent: "center", marginBottom: 30, position: "relative" },
   perfilFoto: { width: 100, height: 100, borderRadius: 50, borderWidth: 3, borderColor: "#ff6a00", backgroundColor: "#f0f0f0" },
   perfilNome: { fontSize: 22, fontFamily: "Poppins_600SemiBold", marginTop: 10 },
@@ -157,10 +154,10 @@ const styles = StyleSheet.create({
   configIcon: { fontSize: 28, color: "#ff6a00" },
   section: { marginBottom: 30 },
   sectionTitle: { fontSize: 18, fontFamily: "Poppins_600SemiBold", marginBottom: 10 },
-  receitaCard: { width: 150, backgroundColor: "#fafafa", borderRadius: 12, marginRight: 15, shadowColor: "#000", shadowOpacity: 0.1, shadowOffset: { width: 0, height: 2 }, shadowRadius: 5, elevation: 3, alignItems: "center" },
+  receitaCard: { width: 150,  borderRadius: 12, marginRight: 15,  alignItems: "center",  border: "1px", borderColor: "rgba(0,0,0,0.06)", background: "#fbfbfb" },
   receitaImg: { width: "100%", height: 100, borderRadius: 12 },
-  receitaNome: { fontSize: 14, marginVertical: 5, textAlign: "center" },
+  receitaNome: { fontSize: 14, marginVertical: 5, textAlign: "center", fontFamily: 'Poppins_600SemiBold'},
   favorito: { color: "red", fontSize: 18 },
-  buttonDanger: { width: 180, height: 60, backgroundColor: "#ff4b5c", borderRadius: 10, alignSelf: "center", justifyContent: "center", alignItems: "center", marginTop: 10 },
-  buttonDangerText: { color: "#fff", fontFamily: "Poppins_700Bold", fontSize: 18 },
+  buttonDanger: { width: 140, height: 40, backgroundColor: "#ff4b5c", borderRadius: 10, alignSelf: "center", justifyContent: "center", alignItems: "center", marginTop: 10 },
+  buttonDangerText: { color: "#fff", fontFamily: "Poppins_700Bold", fontSize: 12 },
 });

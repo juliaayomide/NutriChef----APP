@@ -1,4 +1,3 @@
-// Logo.jsx
 import React from 'react';
 import { View, Image, StyleSheet } from 'react-native';
 
@@ -20,7 +19,7 @@ const styles = StyleSheet.create({
     marginVertical: 10,
   },
   logo: {
-    width: 200,  // tamanho fixo
-    height: 100, // tamanho fixo
+    width: 200,  
+    height: 100, 
   },
 });

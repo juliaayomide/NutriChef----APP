@@ -1,11 +1,9 @@
 import React, { useEffect, useState, createContext } from 'react';
-import { StyleSheet, ImageBackground, ScrollView, View, Image, Text, TouchableOpacity, FlatList, Platform } from 'react-native';
+import { StyleSheet, ImageBackground, ScrollView, View, Image, Text, TouchableOpacity, FlatList, Platform, Modal, Pressable } from 'react-native';
 import Logo from '../components/Logo';
 import { Ionicons } from '@expo/vector-icons';
 import { AntDesign } from '@expo/vector-icons';
 import { useContext } from 'react';
-// index.js ou App.js
-
 
 import { FavoritesContext } from '../contexts/FavoritesContext';
 import BottomNav from '../components/BottomNav';
@@ -15,11 +13,8 @@ export default function Home({ navigation }) {
   const [user, setUser] = useState(null);
 
   const { toggleFavorite, isFavorite } = useContext(FavoritesContext);
+  const [showLoginModal, setShowLoginModal] = useState(false);
 
-  //Fonte
-  
-
-  // Filtros gerais
   const receitasPopulares = receitas.slice(0, 10);
   const receitasDiaDia = receitas.filter(r => r.tempo_preparo <= 40);
   const receitasCaféLanche = receitas.filter(r =>
@@ -28,22 +23,27 @@ export default function Home({ navigation }) {
     )
   );
 
-  
-
-   useEffect(() => {
-    fetch('http://localhost:3001/')
-      .then(res => res.json())
-      .then(data => setReceitas(data))
+   useEffect(() => { 
+    fetch('http://localhost:3001/') 
+      .then(res => res.json()) 
+      .then(data => setReceitas(data)) 
       .catch(err => console.error('Erro ao carregar receitas:', err));
-
-    // Checar se usuário está logado
-    fetch('http://localhost:3001/perfil', { credentials: "include" })
-      .then(res => res.json())
-      .then(data => {
-        if (data.success) setUser(data.usuario);
-      })
-      .catch(() => setUser(null));
-  }, []);
+    fetch('http://localhost:3001/perfil', { credentials: "include" }) 
+      .then(res => res.json()) 
+    .then(data => { 
+      if (data.success) {
+        if (data.usuario.status === "suspenso") {
+          alert(`Sua conta foi suspensa!\nMotivo: ${data.usuario.motivo_suspensao}`);
+          setUser(null); 
+        } else {
+          setUser(data.usuario);
+        }
+      } else {
+        setUser(null);
+      }
+    }) 
+    .catch(() => setUser(null)); 
+    }, []);
   
   function formatarTempo(minutos) {
     if (!minutos || isNaN(minutos)) return "Tempo não informado";
@@ -64,15 +64,19 @@ export default function Home({ navigation }) {
         <Text style={styles.recipeTime}>⏱ {formatarTempo(item.tempo_preparo)}</Text>
       </TouchableOpacity>
 
-      {/* ❤️ Botão de Favoritar */}
       <TouchableOpacity
         style={styles.heartBtn}
-        onPress={() => toggleFavorite({
-          id_receita: item.id_receitas,
-          nome: item.nome,
-          tempo: formatarTempo(item.tempo_preparo),
-          imagem: item.imagem
-        }, user?.id_usuarios)}
+        onPress={() => {
+          if (!user) {
+            setShowLoginModal(true);
+          } else {
+            toggleFavorite({
+              id_receita: item.id_receitas,
+              nome: item.nome,
+              tempo: formatarTempo(item.tempo_preparo),
+              imagem: item.imagem
+            }, user.id_usuarios);
+          }}}
       >
         <AntDesign
           name={isFavorite(item.id_receitas) ? "heart" : "hearto"}
@@ -87,7 +91,6 @@ export default function Home({ navigation }) {
     <View style={styles.screen}>
       <ScrollView style={styles.scroll} contentContainerStyle={{ paddingBottom: 100 }} showsVerticalScrollIndicator={false}>
         
-       {/* Cabeçalho */}
         <View style={styles.headerContainer}>
           <Logo/>
            <TouchableOpacity
@@ -100,7 +103,6 @@ export default function Home({ navigation }) {
         </View>
 
         <View style={styles.bodyContainer}>
-          {/* CATEGORIAS */}
           <View style={styles.sectionHeader}>
             <Text style={styles.title}>Categorias</Text>
             <TouchableOpacity onPress={() => navigation.navigate('allCategorias')}>
@@ -108,59 +110,56 @@ export default function Home({ navigation }) {
             </TouchableOpacity>
           </View>
 
-<View style={styles.categories}>
-  {/* Botão com imagem de fundo */}
-  <TouchableOpacity
-    onPress={() => navigation.navigate('Categoria', { nome: 'Pratos Proteicos' })}
-  >
-    <ImageBackground
-      source={require('../assets/proteinas.jpeg')}
-      style={styles.categoryCard}
-      imageStyle={{ borderRadius: 15, filter: 'blur(0.5px)',  filter: 'brightness(0.8)' }} // opcional, arredonda a imagem igual ao card
-    >
-      <Text style={styles.cardText}>Proteicos</Text>
-    </ImageBackground>
-  </TouchableOpacity>
+        <View style={styles.categories}>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Categoria', { nome: 'Pratos Proteicos' })}
+          >
+            <ImageBackground
+              source={require('../assets/proteinas.jpeg')}
+              style={styles.categoryCard}
+              imageStyle={{ borderRadius: 15, filter: 'blur(0.5px)',  filter: 'brightness(0.8)' }} 
+            >
+              <Text style={styles.cardText}>Proteicos</Text>
+            </ImageBackground>
+          </TouchableOpacity>
 
-  {/* Botões com cor de fundo */}
-  <TouchableOpacity
-    onPress={() => navigation.navigate('Categoria', { nome: 'Massas' })}
-  >
-    <ImageBackground
-      source={require('../assets/massas.jpeg')}
-      style={styles.categoryCard}
-      imageStyle={{ borderRadius: 15, filter: 'blur(0.5px)',  filter: 'brightness(0.8)'  }} // opcional, arredonda a imagem igual ao card
-    >
-      <Text style={styles.cardText}>Massas</Text>
-    </ImageBackground>
-  </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Categoria', { nome: 'Massas' })}
+          >
+            <ImageBackground
+              source={require('../assets/massas.jpeg')}
+              style={styles.categoryCard}
+              imageStyle={{ borderRadius: 15, filter: 'blur(0.5px)',  filter: 'brightness(0.8)'  }} 
+            >
+              <Text style={styles.cardText}>Massas</Text>
+            </ImageBackground>
+          </TouchableOpacity>
 
-  <TouchableOpacity
-    onPress={() => navigation.navigate('Categoria', { nome: 'Saladas' })}
-  >
-    <ImageBackground
-      source={require('../assets/saladas.jpeg')}
-      style={styles.categoryCard}
-      imageStyle={{ borderRadius: 15, filter: 'blur(0.5px)',  filter: 'brightness(0.8)' }} // opcional, arredonda a imagem igual ao card
-    >
-      <Text style={styles.cardText}>Saladas</Text>
-    </ImageBackground>
-  </TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Categoria', { nome: 'Saladas' })}
+          >
+            <ImageBackground
+              source={require('../assets/saladas.jpeg')}
+              style={styles.categoryCard}
+              imageStyle={{ borderRadius: 15, filter: 'blur(0.5px)',  filter: 'brightness(0.8)' }} 
+            >
+              <Text style={styles.cardText}>Saladas</Text>
+            </ImageBackground>
+          </TouchableOpacity>
 
-  <TouchableOpacity
-    onPress={() => navigation.navigate('Categoria', { nome: 'Doces' })} 
-  >
-    <ImageBackground
-      source={require('../assets/doces.jpeg')}
-      style={styles.categoryCard}
-      imageStyle={{ borderRadius: 15, filter: 'blur(0.5px)',  filter: 'brightness(0.8)' }} // opcional, arredonda a imagem igual ao card
-    >
-      <Text style={styles.cardText}>Doces</Text>
-    </ImageBackground>
-  </TouchableOpacity>
-</View>
+          <TouchableOpacity
+            onPress={() => navigation.navigate('Categoria', { nome: 'Doces' })} 
+          >
+            <ImageBackground
+              source={require('../assets/doces.jpeg')}
+              style={styles.categoryCard}
+              imageStyle={{ borderRadius: 15, filter: 'blur(0.5px)',  filter: 'brightness(0.8)' }} 
+            >
+              <Text style={styles.cardText}>Doces</Text>
+            </ImageBackground>
+          </TouchableOpacity>
+        </View>
 
-          {/* 🍽️ POPULARES */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.title}>Populares da Semana</Text>
@@ -174,7 +173,6 @@ export default function Home({ navigation }) {
             />
           </View>
 
-          {/* 👨‍🍳 DO DIA A DIA */}
           <View style={styles.section}>
             <View style={styles.sectionHeader}>
               <Text style={styles.title}>Do Dia a Dia</Text>
@@ -188,7 +186,6 @@ export default function Home({ navigation }) {
             />
           </View>
 
-          {/* ☕ CAFÉ E LANCHES */}
           {receitasCaféLanche.length > 0 && (
             <View style={styles.section}>
               <View style={styles.sectionHeader}>
@@ -205,6 +202,55 @@ export default function Home({ navigation }) {
           )}
         </View>
       </ScrollView>
+
+      <Modal
+        visible={showLoginModal}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setShowLoginModal(false)}
+      >
+        <View style={{
+          flex:1,
+          backgroundColor:'rgba(0,0,0,0.5)',
+          justifyContent:'center',
+          alignItems:'center',
+          padding:20
+        }}>
+          <View style={{
+            width:'100%',
+            backgroundColor:'#fff',
+            borderRadius:15,
+            padding:20,
+            alignItems:'center'
+          }}>
+            <Pressable
+              onPress={() => setShowLoginModal(false)}
+              style={{ alignSelf:'flex-end', marginBottom:10 }}
+            >
+              <Text style={{ fontSize:18, fontWeight:'bold' }}>×</Text>
+            </Pressable>
+
+            <Text style={{ fontSize:16, textAlign:'center', marginBottom:20 }}>
+              Antes de favoritar receitas, cadastre-se
+            </Text>
+
+            <TouchableOpacity
+              onPress={() => {
+                setShowLoginModal(false);
+                navigation.navigate('CadastroLogin');
+              }}
+              style={{
+                backgroundColor:'#FF6300',
+                paddingVertical:10,
+                paddingHorizontal:25,
+                borderRadius:10
+              }}
+            >
+              <Text style={{ color:'#fff', fontWeight:'bold', fontSize:16 }}>Cadastrar</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
 
       <BottomNav
   navigation={navigation}
@@ -223,8 +269,16 @@ const shadowStyle = Platform.select({
 });
 
 const styles = StyleSheet.create({
-  screen: { flex: 1, backgroundColor: '#fafafa',},
-  scroll: { flex: 1, backgroundColor: '#fafafa' },
+  screen: { 
+    flex: 1, 
+    backgroundColor: '#fafafa',
+  },
+
+  scroll: { 
+    flex: 1, 
+    backgroundColor: '#fafafa' 
+  },
+
   headerContainer: {
     paddingTop: 40,
     paddingHorizontal: 20,
@@ -233,83 +287,10 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 30,
     borderBottomRightRadius: 30,
     ...shadowStyle,
-    marginTop:-40,
+    marginTop: -40,
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 10,
-  },
-  searchBar: {
-    backgroundColor: '#f4f4f4',
-    borderRadius: 25,
-    paddingVertical: 10,
-    paddingHorizontal: 15,
-    borderWidth: 1,
-    borderColor: '#ddd',
-    marginTop: -30,
-  },
-  searchText: { color: '#d80303ff', fontSize: 15 },
-  bodyContainer: { paddingHorizontal: 20, paddingTop: 10 },
-  sectionHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
-  title: { fontSize: 19, fontFamily: "Poppins_700Bold", color: '#333', marginTop: 15, marginBottom: 8, marginLeft:5 },
-  subtitle: { fontSize: 18, fontFamily: "Poppins_600SemiBold", color: '#444', marginTop: 20 },
-  viewAll: { color: '#FF6300', fontFamily: 'Poppins_500Medium' },
-
-  categories: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  categoryCard: {
-    width: '45%',
-    borderRadius: 20,
-    paddingVertical: 20,
-    marginBottom: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadowStyle,
-  },
-  cardText: { color: '#101010ff', fontFamily: "Poppins_700Bold", fontSize: 16 },
-  recipeCard: {
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    marginRight: 15,
-    padding: 10,
-    width: 140,
-    ...shadowStyle,
-  },
-  recipeImage: { width: '100%', height: 110, borderRadius: 10 },
-  recipeTitle: { fontFamily: 'Poppins_600SemiBold', marginTop: 8, color: '#333' },
-  recipeTime: { color: '#777', marginTop: 3 },
-
-
-
-  categories: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    padding: 10,
-  },
-  categoryCard: {
-    width: 140,
-    height: 100,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    
-    overflow: 'hidden', // importante para arredondar a imagem
-    marginBottom: 15,
-  },
-  cardText: {
-    color: '#ffffffff',
-    fontFamily: 'Poppins_700Bold',
-    fontSize: 14,
-    paddingHorizontal: 10,
-    paddingVertical: 8,
-    borderRadius: 12,
-  },
-  ImageBackground: {
-    filter: 'blur(10px)',
   },
 
   searchBar: {
@@ -322,21 +303,87 @@ const styles = StyleSheet.create({
     height: 40,
     width: '90%',
   },
+
+  searchText: { 
+    color: '#555',
+    fontSize: 16, 
+    fontFamily: 'Poppins_400Regular'
+  },
+
   icon: {
     marginRight: 8,
   },
-  searchText: {
-    color: '#000000ff',
-    fontSize: 14,
+
+  bodyContainer: { 
+    paddingHorizontal: 20, 
+    paddingTop: 10 
   },
 
- overlay: {
+  sectionHeader: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    alignItems: 'center', 
+    marginBottom: 10 
+  },
+
+  title: { 
+    fontSize: 19, 
+    fontFamily: "Poppins_700Bold", 
+    color: '#333', 
+    marginTop: 15, 
+    marginBottom: 8, 
+    marginLeft: 5 
+  },
+
+  subtitle: { 
+    fontSize: 18, 
+    fontFamily: "Poppins_600SemiBold", 
+    color: '#444', 
+    marginTop: 20 
+  },
+
+  viewAll: { 
+    color: '#FF6300', 
+    fontFamily: 'Poppins_500Medium' 
+  },
+
+  categories: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    marginBottom: 20,
+  },
+
+  categoryCard: {
+    width: 150,
+    height: 100,
+    borderRadius: 15,
+    justifyContent: 'center',
+    alignItems: 'center',
+    overflow: 'hidden',
+    marginBottom: 15,
+    ...shadowStyle,
+  },
+
+  cardText: {
+    color: '#ffffff',
+    fontFamily: 'Poppins_700Bold',
+    fontSize: 18,
+    paddingHorizontal: 10,
+    paddingVertical: 5,
+    borderRadius: 8,
+  },
+
+  ImageBackground: {
+    filter: 'blur(10px)',
+  },
+
+  overlay: {
     ...StyleSheet.absoluteFillObject,
     backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: 15,
   },
 
-  /* 🔥 ADICIONADO: Coração nos cards */
   heartBtn: {
     position: 'absolute',
     top: 8,
@@ -362,89 +409,33 @@ const styles = StyleSheet.create({
   heartIcon: {
     transitionDuration: '150ms',
   },
-   categories: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginBottom: 20,
-  },
-  categoryCard: {
-    width: '45%',
-    borderRadius: 20,
-    paddingVertical: 20,
-    marginBottom: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    ...shadowStyle,
-  },
-  cardText: { color: '#101010ff', fontFamily: 'Poppins_700Bold', fontSize: 16 },
+
   recipeCard: {
     backgroundColor: '#fff',
     borderRadius: 15,
     marginRight: 15,
     padding: 10,
     width: 160,
-
-  },
-  recipeImage: { width: '100%', height: 110, borderRadius: 10 },
-  recipeTitle: { fontFamily: 'Poppins_600SemiBold', marginTop: 8, color: '#333' },
-  recipeTime: { color: '#777', marginTop: 3 },
-
-
-
-  categories: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    padding: 10,
-  },
-  categoryCard: {
-    width: 150,
-    height: 100,
-    borderRadius: 15,
-    justifyContent: 'center',
-    alignItems: 'center',
-    
-    overflow: 'hidden', // importante para arredondar a imagem
-    marginBottom: 15,
-  },
-  cardText: {
-    color: '#ffffffff',
-    fontFamily: 'Poppins_700Bold',
-    fontSize: 18,
-    paddingHorizontal: 10,
-    paddingVertical: 5,
-    borderRadius: 8,
-  },
-  ImageBackground: {
-    filter: 'blur(10px)',
+    ...shadowStyle
   },
 
-  searchBar: {
-    marginTop: -25,
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#f2f2f2',
-    borderRadius: 30,
-    paddingHorizontal: 10,
-    height: 40,
-    width: '90%',
-  },
-  icon: {
-    marginRight: 8,
-  },
-  searchText: {
-    color: '#555',
-    fontSize: 16,
+  recipeImage: { 
+    width: '100%', 
+    height: 110, 
+    borderRadius: 10 
   },
 
- overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 15,
+  recipeTitle: { 
+    fontFamily: 'Poppins_600SemiBold', 
+    marginTop: 8, 
+    color: '#333' 
   },
 
-
+  recipeTime: { 
+    color: '#777', 
+    marginTop: 3,
+    fontFamily: 'Poppins_500Medium'
+  },
 
 });
 

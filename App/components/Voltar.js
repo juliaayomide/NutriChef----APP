@@ -3,16 +3,15 @@ import { View, Text, TouchableOpacity, StyleSheet, useWindowDimensions, Platform
 import { Ionicons } from '@expo/vector-icons';
 import Logo from './Logo';
 
-const HEADER_HEIGHT = 70; // altura fixa do header
+const HEADER_HEIGHT = 70; 
 
 export default function Header({ navigation }) {
   const { width } = useWindowDimensions(); 
-  const showBackText = width > 500; // mostra "Voltar" apenas se a tela for larga
+  const showBackText = width > 500; 
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.headerContainer}>
-        {/* Botão de voltar */}
         <View style={styles.side}>
           <TouchableOpacity style={styles.backButton} onPress={() => navigation.navigate('Home')}>
             <Ionicons name="arrow-back" size={20} color="#fff" />
@@ -20,12 +19,10 @@ export default function Header({ navigation }) {
           </TouchableOpacity>
         </View>
 
-        {/* Logo centralizada */}
         <View style={styles.logoWrapper}>
           <Logo />
         </View>
 
-        {/* Espaço à direita igual ao esquerdo */}
         <View style={styles.side} />
       </View>
     </View>
@@ -34,7 +31,7 @@ export default function Header({ navigation }) {
 
 const styles = StyleSheet.create({
   wrapper: {
-    height: HEADER_HEIGHT, // reserva espaço no topo para o header
+    height: HEADER_HEIGHT, 
     width: '100%',
     marginRight:50,
   },
@@ -45,7 +42,7 @@ const styles = StyleSheet.create({
     marginLeft:15,
     height: HEADER_HEIGHT,
     paddingVertical: 10,
-    backgroundColor: '#fdfdfd',
+    backgroundColor: '#fafafa',
     ...Platform.select({
       web: { position: 'fixed', top: 0, left: 0, zIndex: 1000 },
       default: { position: 'absolute', top: 0, left: 0, zIndex: 1000 },

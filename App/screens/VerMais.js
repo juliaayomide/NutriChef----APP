@@ -11,10 +11,8 @@ export default function ReceitasPorCategoria({ navigation }) {
   useEffect(() => {
     async function carregarCategoriasComReceitas() {
       try {
-        // 1️⃣ Busca todas as categorias
         const { data: categoriasAPI } = await axios.get("http://localhost:3001/categorias");
 
-        // 2️⃣ Para cada categoria, busca suas receitas
         const categoriasComReceitas = await Promise.all(
           categoriasAPI.map(async (cat) => {
             const { data } = await axios.get(`http://localhost:3001/categoria/${cat.nome}`);
@@ -33,7 +31,6 @@ export default function ReceitasPorCategoria({ navigation }) {
     carregarCategoriasComReceitas();
   }, []);
 
-    // 🔹 Converte minutos em formato "XhYmin"
     function formatarTempo(minutos) {
     if (!minutos || isNaN(minutos)) return "Tempo não informado";
 
@@ -63,7 +60,6 @@ export default function ReceitasPorCategoria({ navigation }) {
         <View key={index} style={styles.section}>
           <Text style={styles.sectionTitle}>{categoria.nome}</Text>
 
-          {/* 🔹 Scroll horizontal para receitas */}
           <ScrollView horizontal showsHorizontalScrollIndicator={false}>
             <View style={styles.recipesRow}>
               {categoria.receitas.length === 0 ? (
@@ -111,7 +107,6 @@ const styles = StyleSheet.create({
     color: "#e68900",
     marginBottom: 12,
   },
-  // 🔹 linha horizontal com rolagem
   recipesRow: {
     flexDirection: "row",
     gap: 12,

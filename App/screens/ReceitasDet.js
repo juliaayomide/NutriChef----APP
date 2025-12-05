@@ -142,52 +142,59 @@ const styles = StyleSheet.create({
   },
   recipeImage: {
     width: '60%',
-    height: undefined,      // permite ajustar altura proporcional
-    aspectRatio: 1.5,       // controla a proporção da imagem (1.5 = mais larga, 1 = quadrada, 0.75 = mais alta)
+    height: undefined,      
+    aspectRatio: 1.5,       
     borderRadius: 8,
     marginBottom: 15,
-    resizeMode: 'cover',    // corta suavemente mantendo proporção
-    alignSelf: 'center',    // centraliza a própria imagem
+    resizeMode: 'cover',    
+    alignSelf: 'center',    
   },
   title: {
     fontSize: 24,
+    color: '#555',
     fontFamily: 'Poppins_700Bold',
     marginBottom: 5,
+    textAlign: 'center',
   },
   author: {
     fontSize: 14,
     color: '#555',
     marginBottom: 10,
+    fontFamily: 'Poppins_600SemiBold',
   },
   description: {
     fontSize: 14,
     color: '#555',
     marginBottom: 15,
+     fontFamily: 'Poppins_400Regular',
   },
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Poppins_600SemiBold',
     marginTop: 15,
     marginBottom: 5,
+    fontFamily: 'Poppins_400Regular',
   },
   listItem: {
     fontSize: 14,
     color: '#555',
     marginLeft: 10,
     marginBottom: 3,
+    fontFamily: 'Poppins_400Regular',
   },
   time: {
     fontSize: 14,
     color: '#555',
     marginBottom: 5,
+    fontFamily:  "Poppins_600SemiBold",
   },
   step: {
     fontSize: 14,
     color: '#555',
     marginBottom: 5,
+    fontFamily: 'Poppins_400Regular',
     marginLeft: 10,
   },
-  // Estilos da tabela nutricional
   nutriContainer: {
     marginTop: 25,
     backgroundColor: '#ffffffff',
@@ -196,6 +203,7 @@ const styles = StyleSheet.create({
     shadowColor: '#e8e8e8ff',
     shadowOpacity: 1,
     shadowRadius: 15,
+    marginBottom: 30,
   },
   nutriTitle: {
     fontSize: 18,
@@ -223,6 +231,7 @@ const styles = StyleSheet.create({
   nutriValue: {
     fontSize: 15,
     color: '#050505ff',
+    fontFamily: 'Poppins_400Regular',
   },
   noData: {
     marginTop: 10,

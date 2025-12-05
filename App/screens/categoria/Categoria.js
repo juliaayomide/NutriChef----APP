@@ -111,6 +111,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#555',
     marginBottom: 15,
+    fontFamily: 'Poppins_400Regular',
   },
   link: {
     color: 'red',
@@ -148,6 +149,7 @@ const styles = StyleSheet.create({
     marginTop: 5,
     fontFamily: 'Poppins_700Bold',
     fontSize: 14,
+    color: '#272727ff',
   },
   recipeTime: {
     fontSize: 12,

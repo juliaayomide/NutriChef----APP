@@ -1,9 +1,7 @@
-// ----- Seleção das telas -----
 const welcomeScreen = document.getElementById("welcome-screen");
 const loginScreen = document.getElementById("login-screen");
 const registerScreen = document.getElementById("register-screen");
 
-// ----- Botões de navegação -----
 document.getElementById("welcome-login-button").onclick = () => {
   welcomeScreen.classList.remove("active");
   loginScreen.classList.add("active");
@@ -32,7 +30,6 @@ function voltarParaWelcome() {
   welcomeScreen.classList.add("active");
 }
 
-// ----- Toggle de senha -----
 document.querySelectorAll('.toggle-password').forEach(icon => {
   const input = document.querySelector(icon.getAttribute('toggle'));
   icon.addEventListener('click', () => {
@@ -43,24 +40,19 @@ document.querySelectorAll('.toggle-password').forEach(icon => {
   });
 });
 
-// Switch between screens
 function showScreen(screenToShow) {
-    // Hide all screens
     welcomeScreen.classList.remove('active');
     registerScreen.classList.remove('active');
     loginScreen.classList.remove('active');
     
-    // Show the requested screen
     screenToShow.classList.add('active');
     
-    // Clear messages when switching screens
     registerMsg.className = 'msg';
     registerMsg.textContent = '';
     loginMsg.className = 'msg';
     loginMsg.textContent = '';
 }
 
-// ----- Formulário de cadastro -----
 const registerForm = document.getElementById('register-form');
 const registerMsg = document.getElementById('register-msg');
 
@@ -72,14 +64,12 @@ registerForm.addEventListener('submit', async (e) => {
   const senha = document.getElementById('register-password').value;
   const confirmPassword = document.getElementById('register-password-confirm').value;
 
-  // Reset de mensagens de erro
   document.querySelectorAll('.error-message').forEach(el => el.style.display = 'none');
   registerMsg.textContent = '';
   registerMsg.className = 'msg';
 
   let isValid = true;
 
-  // Validações
   if (nome.length < 3) {
     document.getElementById('name-error').textContent = 'Nome deve ter pelo menos 3 caracteres';
     document.getElementById('name-error').style.display = 'block';
@@ -135,7 +125,6 @@ registerForm.addEventListener('submit', async (e) => {
   }
 });
 
-// ----- Formulário de login -----
 const loginForm = document.getElementById('login-form');
 const loginMsg = document.getElementById('login-msg');
 
@@ -168,7 +157,6 @@ loginForm.addEventListener('submit', async (e) => {
     loginMsg.className = 'msg success';
     loginForm.reset();
 
-    // Redireciona para perfil
     setTimeout(() => window.location.href = '/perfil', 1000);
 
   } catch (error) {

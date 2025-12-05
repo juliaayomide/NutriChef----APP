@@ -20,15 +20,12 @@ export default function Favoritos({ navigation }) {
   const numColumns = width > 400 ? 2 : 1;
   const cardWidth = (width - 30 - (numColumns - 1) * 15) / numColumns;
 
-  // ✅ Carregar usuário e favoritos
   useEffect(() => {
     fetch('http://localhost:3001/perfil', { credentials: "include" })
       .then(res => res.json())
       .then(data => {
         if (data.success) {
           setUser(data.usuario);
-
-          // Se o backend enviar as favoritas
           if (data.usuario.favoritas) setFavorites(data.usuario.favoritas);
         } else {
           navigation.replace("CadastroLogin");
@@ -40,7 +37,7 @@ export default function Favoritos({ navigation }) {
   if (!user) return null;
 
   return (
-    <View style={{ flex: 1, backgroundColor: '#fff',}}>
+    <View style={{ flex: 1, backgroundColor: '#fafafa',}}>
       <Header navigation={navigation} />
 
       <FlatList
@@ -63,7 +60,7 @@ export default function Favoritos({ navigation }) {
 
             <View style={styles.recipeInfo}>
               <Text style={styles.recipeName}>{item.nome}</Text>
-              <Text style={styles.recipeTime}>⏱ {item.tempo}</Text>
+              <Text style={styles.recipeTime}>⏱ {item.tempo }</Text>
             </View>
 
             <TouchableOpacity
@@ -83,7 +80,8 @@ export default function Favoritos({ navigation }) {
 }
 
 const styles = StyleSheet.create({
-  content: { padding: 10 },
+  content: { padding: 10, backgroundColor: '#fafafa', },
+   screen: { backgroundColor: '#fafafa',},
   emptyText: {
     fontSize: 16,
     color: '#888',
@@ -91,11 +89,12 @@ const styles = StyleSheet.create({
     marginTop: 50,
   },
   recipeCard: {
-    backgroundColor: '#fff',
+    backgroundColor: '#ffffffff',
     borderRadius: 15,
     overflow: 'hidden',
     margin: 5,
     elevation: 3,
+    
   },
   recipeImage: {
     width: '100%',
@@ -103,9 +102,9 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 15,
     borderTopRightRadius: 15,
   },
-  recipeInfo: { padding: 10 },
-  recipeName: { fontFamily: 'Poppins_700Bold', fontSize: 16, color: '#444' },
-  recipeTime: { fontSize: 12, color: '#888', marginTop: 3 },
+  recipeInfo: { padding: 10, fontFamily: 'Poppins_600SemiBold' },
+  recipeName: { fontFamily: 'Poppins_700Bold', fontSize: 16, color: '#444', fontFamily: 'Poppins_600SemiBold' },
+  recipeTime: { fontSize: 12, color: '#888', marginTop: 3, fontFamily: 'Poppins_600SemiBold' },
   heartBtn: { position: 'absolute', top: 10, right: 10 },
   heartText: { fontSize: 22 },
 });

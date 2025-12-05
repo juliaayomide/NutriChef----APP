@@ -9,7 +9,6 @@ export default function ConfigPerfil() {
   const navigation = useNavigation();
   const [usuario, setUsuario] = useState(null);
 
-  // Buscar usuário logado
   useEffect(() => {
     fetch("http://localhost:3001/perfil", { credentials: "include" })
       .then((res) => res.json())
@@ -17,7 +16,7 @@ export default function ConfigPerfil() {
         if (data.success && data.usuario) {
           setUsuario(data.usuario);
         } else {
-          navigation.replace("CadastroLogin"); // redireciona se não logado
+          navigation.replace("CadastroLogin"); 
         }
       })
       .catch((err) => {
@@ -26,7 +25,6 @@ export default function ConfigPerfil() {
       });
   }, []);
 
-  // Logout
   const handleLogout = () => {
     const logoutFetch = () => {
       fetch("http://localhost:3001/nutrichef/1.0.0/logout", {
@@ -68,7 +66,6 @@ export default function ConfigPerfil() {
     <ScrollView style={styles.container}>
       <Header navigation={navigation} />
 
-      {/* Perfil do Usuário */}
       <View style={styles.configUser}>
         <Image
           source={{
@@ -85,7 +82,6 @@ export default function ConfigPerfil() {
         </TouchableOpacity>
       </View>
 
-      {/* Lista de opções */}
       <View style={styles.configOpcoes}>
         <Text style={styles.opcoesTitle}>Configurações</Text>
         <TouchableOpacity style={styles.opcaoItem}>
@@ -102,7 +98,6 @@ export default function ConfigPerfil() {
         </TouchableOpacity>
       </View>
 
-      {/* Botão sair */}
       <TouchableOpacity style={styles.btnLogout} onPress={handleLogout}>
         <Text style={styles.btnLogoutText}>Sair</Text>
       </TouchableOpacity>
@@ -113,7 +108,6 @@ export default function ConfigPerfil() {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: "#fff", },
 
-  // ===== Perfil do usuário =====
   configUser: { alignItems: "center", marginBottom: 30 },
   fotoPerfil: {
     width: 110,
@@ -133,7 +127,6 @@ const styles = StyleSheet.create({
   },
   btnEditarText: { color: "#fff", fontFamily: "Poppins_500Medium", fontSize: 14 },
 
-  // ===== Opções =====
   configOpcoes: { marginBottom: 30 },
   opcoesTitle: { fontSize: 16, fontFamily: "Poppins_600SemiBold", marginBottom: 10 },
   opcaoItem: {
@@ -147,7 +140,6 @@ const styles = StyleSheet.create({
   opcaoTexto: { fontSize: 15, color: "#111" },
   seta: { fontSize: 18, color: "#999" },
 
-  // ===== Botão Logout =====
   btnLogout: {
     backgroundColor: "#ff4b5c",
     paddingVertical: 12,

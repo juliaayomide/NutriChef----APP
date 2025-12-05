@@ -1,4 +1,3 @@
-// CardCategoria.jsx
 import React from 'react';
 
 export default function CardCategoria({ name, image }) {

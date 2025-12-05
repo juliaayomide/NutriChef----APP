@@ -11,7 +11,7 @@ import Header from '../../components/Voltar';
 
 export default function Pesquisa({ navigation }) {
   const [search, setSearch] = useState('');
-  const [selecionados, setSelecionados] = useState([]); // ingredientes escolhidos
+  const [selecionados, setSelecionados] = useState([]); 
 
   const handleSearch = () => {
     console.log('Buscar:', search);
@@ -41,24 +41,20 @@ export default function Pesquisa({ navigation }) {
     'Requeijão', 'Iogurte', 'Creme de leite', 'Leite condensado'
   ];
 
-  // 🔹 Adiciona ou remove ingrediente
   const toggleIngrediente = (item) => {
     setSelecionados((prev) => {
       if (prev.includes(item)) {
-        // remove
         const atualizados = prev.filter((i) => i !== item);
-        setSearch(atualizados.join(', ')); // atualiza barra
+        setSearch(atualizados.join(', ')); 
         return atualizados;
       } else {
-        // adiciona
         const atualizados = [...prev, item];
-        setSearch(atualizados.join(', ')); // atualiza barra
+        setSearch(atualizados.join(', ')); 
         return atualizados;
       }
     });
   };
 
-  // 🔹 Renderiza os botões de ingredientes
   const renderButtons = (items, color) => (
     <View style={[styles.suggestionGrid, { backgroundColor: color }]}>
       {items.map((item) => {
@@ -85,7 +81,6 @@ export default function Pesquisa({ navigation }) {
     <ScrollView style={styles.container}>
       <Header navigation={navigation} />
 
-      {/* Input de pesquisa */}
       <TextInput
         style={styles.searchInput}
         placeholder="Pesquisar receitas"
@@ -128,11 +123,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderWidth: 0,
     fontSize: 16,
+    fontFamily: 'Poppins_400Regular',
   },
   infoText: {
     marginVertical: 10,
     fontSize: 14,
     color: '#555',
+    fontFamily: 'Poppins_400Regular',
   },
   sectionTitle: {
     fontSize: 18,

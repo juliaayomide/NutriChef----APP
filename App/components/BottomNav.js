@@ -5,10 +5,8 @@ export default function BottomNav({ navigation, active, isLoggedIn, usuario }) {
   
   function handleFavoritos() {
     if (!isLoggedIn) {
-      // Usuário não está logado → vai para CadastroLogin
       return navigation.navigate("CadastroLogin");
     }
-    // Usuário logado → vai para Favoritos
     navigation.navigate("Favoritos");
   }
   
@@ -20,7 +18,7 @@ export default function BottomNav({ navigation, active, isLoggedIn, usuario }) {
       name: 'Favoritos', 
       icon: 'https://cdn-icons-png.flaticon.com/512/833/833472.png', 
       route: 'Favoritos', 
-      onPress: handleFavoritos // aqui usamos a função customizada
+      onPress: handleFavoritos 
     },
     { name: 'Perfil', icon: 'https://cdn-icons-png.flaticon.com/512/1077/1077063.png', route: 'Perfil' },
   ];
@@ -49,10 +47,11 @@ export default function BottomNav({ navigation, active, isLoggedIn, usuario }) {
 
 const styles = StyleSheet.create({
   bottomNav: {
+    backgroundColor: '#fafafa',
     flexDirection: 'row',
     justifyContent: 'space-around',
     alignItems: 'center',
-    backgroundColor: '#fff',
+   
     borderTopWidth: 1,
     borderTopColor: '#ddd',
     paddingVertical: 10,
@@ -63,6 +62,7 @@ const styles = StyleSheet.create({
     shadowRadius: 5,
     elevation: 10,
     position: 'relative',
+    fontFamily: 'Poppins_400Regular',
   },
   navItem: {
     alignItems: 'center',

@@ -20,7 +20,7 @@ export default function CadastroLogin({ navigation }) {
     confirmarSenha: "",
   });
   const [mensagem, setMensagem] = useState("");
-  const [tipoMensagem, setTipoMensagem] = useState(""); // sucesso | erro
+  const [tipoMensagem, setTipoMensagem] = useState(""); 
 
   const irPara = (novaTela) => {
     setMensagem("");
@@ -28,7 +28,6 @@ export default function CadastroLogin({ navigation }) {
     setTela(novaTela);
   };
 
-  // --- CADASTRO ---
   const handleCadastro = async () => {
     const { nome, email, senha, confirmarSenha } = form;
 
@@ -76,7 +75,6 @@ export default function CadastroLogin({ navigation }) {
     }
   };
 
-  // --- LOGIN ---
   const handleLogin = async () => {
     const { email, senha } = form;
 
@@ -99,13 +97,19 @@ export default function CadastroLogin({ navigation }) {
 
       const data = await response.json();
 
-      if (data.success) {
+       if (data.success) {
         setMensagem("Login realizado com sucesso!");
         setTipoMensagem("sucesso");
         setTimeout(() => {
           setMensagem("");
           navigation.navigate("Perfil");
         }, 1500);
+
+      } else if (data.usuario?.status === "suspenso") {
+        alert(`Não é possível logar!\nMotivo da suspensão: ${data.usuario.motivo_suspensao}`);
+        setMensagem("Conta suspensa.");
+        setTipoMensagem("erro");
+
       } else {
         setMensagem(data.message || "Email ou senha incorretos");
         setTipoMensagem("erro");
@@ -120,7 +124,6 @@ export default function CadastroLogin({ navigation }) {
   return (
     <SafeAreaView style={styles.container}>
         <Header navigation={navigation}/>
-      {/* --- TELA BEM-VINDO --- */}
       {tela === "welcome" && (
         <View style={styles.screen}>
           <Image
@@ -149,7 +152,6 @@ export default function CadastroLogin({ navigation }) {
         </View>
       )}
 
-      {/* --- TELA CADASTRO --- */}
       {tela === "cadastro" && (
         <View style={styles.screen}>
 
@@ -194,7 +196,6 @@ export default function CadastroLogin({ navigation }) {
             <Text style={styles.buttonText}>Cadastrar</Text>
           </TouchableOpacity>
 
-          {/* MENSAGEM DE STATUS */}
           {mensagem ? (
             <Text
               style={[
@@ -212,7 +213,6 @@ export default function CadastroLogin({ navigation }) {
         </View>
       )}
 
-      {/* --- TELA LOGIN --- */}
       {tela === "login" && (
         <View style={styles.screen}>
 
@@ -235,13 +235,10 @@ export default function CadastroLogin({ navigation }) {
             onChangeText={(text) => setForm({ ...form, senha: text })}
           />
 
-          
-
           <TouchableOpacity style={styles.buttonLogin} onPress={handleLogin}>
             <Text style={styles.buttonText}>Entrar</Text>
           </TouchableOpacity>
 
-          {/* MENSAGEM DE STATUS */}
           {mensagem ? (
             <Text
               style={[
@@ -271,7 +268,7 @@ const styles = StyleSheet.create({
   screen: { width: "85%", alignItems: "center" },
   logo: { fontSize: 30, fontFamily: "Poppins_700Bold", color: "#FF6300", marginBottom: 10 },
   title: { fontSize: 24, fontFamily: "Poppins_700Bold", marginBottom: 5 },
-  text: { textAlign: "center", color: "#000000ff", marginBottom: 20 },
+  text: { textAlign: "center", color: "#000000ff", marginBottom: 20, fontFamily: 'Poppins_400Regular', },
   input: {
     width: "100%",
     borderWidth: 1,
@@ -279,6 +276,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
+    fontFamily: 'Poppins_400Regular',
   },
   buttonLogin: {
     backgroundColor: '#FF6300',
@@ -298,10 +296,10 @@ const styles = StyleSheet.create({
     marginTop: 5,
   },
   buttonText: { color: "#fff", fontFamily: "Poppins_700Bold" },
-  link: { color: "#333", marginTop: 10 },
-  mensagem: { marginTop: 10, fontSize: 15, textAlign: "center" },
-  sucesso: { color: "green" },
-  erro: { color: "red" },
-  link: { marginBottom: 10,  marginTop: 5 },
-  link2: { color: "#333", marginTop: 15 },
+  link: { color: "#333", marginTop: 10, fontFamily: 'Poppins_400Regular', },
+  mensagem: { marginTop: 10, fontSize: 15, textAlign: "center", fontFamily: 'Poppins_400Regular', },
+  sucesso: { color: "green", fontFamily: 'Poppins_400Regular', },
+  erro: { color: "red", fontFamily: 'Poppins_400Regular', },
+  link: { marginBottom: 10,  marginTop: 5, fontFamily: 'Poppins_400Regular',},
+  link2: { color: "#333", marginTop: 15, fontFamily: 'Poppins_400Regular', },
 });

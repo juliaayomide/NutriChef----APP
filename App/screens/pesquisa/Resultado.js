@@ -70,7 +70,7 @@ export default function Resultados({ route, navigation }) {
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 15, backgroundColor: '#fdfdfd',},
   title: { fontSize: 20, fontFamily: 'Poppins_700Bold', marginBottom: 15 },
-  listaReceitas: { paddingBottom: 20 },
+  listaReceitas: { paddingBottom: 20, fontFamily: 'Poppins_400Regular', },
   receitaItem: {
     borderWidth: 1,
     borderColor: '#ccc',
@@ -81,7 +81,7 @@ const styles = StyleSheet.create({
     boxShadow: '0px 2px 5px rgba(0,0,0,0.1)',
   },
   receitaNome: { fontSize: 16, fontFamily: 'Poppins_700Bold', marginBottom: 5 },
-  receitaDescricao: { fontSize: 14, color: '#555', marginBottom: 10 },
+  receitaDescricao: { fontSize: 14, color: '#555', marginBottom: 10, fontFamily: 'Poppins_400Regular', },
   verReceitaBtn: {
     alignSelf: 'flex-start',
     paddingVertical: 6,
